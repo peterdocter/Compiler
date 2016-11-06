@@ -543,11 +543,10 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "1.2.l"
-#line 2 "1.2.l"
+#line 1 "flex.l"
+#line 2 "flex.l"
     #include "syntax.tab.h"
-    int num_lines=1;
-#line 551 "lex.yy.c"
+#line 550 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -729,9 +728,9 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 34 "1.2.l"
+#line 33 "flex.l"
 
-#line 735 "lex.yy.c"
+#line 734 "lex.yy.c"
 
 	if ( !(yy_init) )
 		{
@@ -827,12 +826,12 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 35 "1.2.l"
-{++num_lines;}
+#line 34 "flex.l"
+{}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 36 "1.2.l"
+#line 35 "flex.l"
 {
             yylval.a=create_node("STRUCT",0,yylineno);
             return STRUCT;
@@ -840,202 +839,202 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 40 "1.2.l"
+#line 39 "flex.l"
 {
             yylval.a=create_node("RETURN",0,yylineno);
             return RETURN;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 43 "1.2.l"
+#line 42 "flex.l"
 {
         yylval.a=create_node("IF",0,yylineno);
         return IF;}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 46 "1.2.l"
+#line 45 "flex.l"
 {
         yylval.a=create_node("ELSE",0,yylineno);
         return ELSE;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 49 "1.2.l"
+#line 48 "flex.l"
 {
         yylval.a=create_node("WHILE",0,yylineno);
         return WHILE;}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 53 "1.2.l"
+#line 52 "flex.l"
 {
         yylval.a=create_node("TYPE",0,yylineno);
         return TYPE;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 57 "1.2.l"
+#line 56 "flex.l"
 {
         yylval.a=create_node("INT",0,yylineno);
         return INT;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 60 "1.2.l"
+#line 59 "flex.l"
 {
         yylval.a=create_node("FLOAT",0,yylineno);
         return FLOAT;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 64 "1.2.l"
+#line 63 "flex.l"
 {
         yylval.a=create_node("ID",0,yylineno);
         return ID;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 67 "1.2.l"
+#line 66 "flex.l"
 {
         yylval.a=create_node("SEMI",0,yylineno);
         return SEMI;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 70 "1.2.l"
+#line 69 "flex.l"
 {
         yylval.a=create_node("COMMA",0,yylineno);
         return COMMA;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 73 "1.2.l"
+#line 72 "flex.l"
 {
         yylval.a=create_node("ASSIGNOP",0,yylineno);
         return ASSIGNOP;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 76 "1.2.l"
+#line 75 "flex.l"
 {
         yylval.a=create_node("RELOP",0,yylineno);
         return RELOP;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 79 "1.2.l"
+#line 78 "flex.l"
 {
         yylval.a=create_node("PLUS",0,yylineno);
         return PLUS;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 82 "1.2.l"
+#line 81 "flex.l"
 {
         yylval.a=create_node("MINUS",0,yylineno);
         return MINUS;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 85 "1.2.l"
+#line 84 "flex.l"
 {
         yylval.a=create_node("STAR",0,yylineno);
         return STAR;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 88 "1.2.l"
+#line 87 "flex.l"
 {
         yylval.a=create_node("DIV",0,yylineno);
         return DIV;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 91 "1.2.l"
+#line 90 "flex.l"
 {
         yylval.a=create_node("AND",0,yylineno);
         return AND;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 94 "1.2.l"
+#line 93 "flex.l"
 {
         yylval.a=create_node("OR",0,yylineno);
         return OR;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 97 "1.2.l"
+#line 96 "flex.l"
 {
         yylval.a=create_node("DOT",0,yylineno);
         return DOT;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 100 "1.2.l"
+#line 99 "flex.l"
 {
         yylval.a=create_node("NOT",0,yylineno);
         return NOT;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 103 "1.2.l"
+#line 102 "flex.l"
 {
         yylval.a=create_node("LP",0,yylineno);
         return LP;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 106 "1.2.l"
+#line 105 "flex.l"
 {
         yylval.a=create_node("RP",0,yylineno);
         return RP;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 109 "1.2.l"
+#line 108 "flex.l"
 {
         yylval.a=create_node("LB",0,yylineno);
         return LB;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 112 "1.2.l"
+#line 111 "flex.l"
 {
         yylval.a=create_node("RB",0,yylineno);
         return RB;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 115 "1.2.l"
+#line 114 "flex.l"
 {
         yylval.a=create_node("LC",0,yylineno);
         return LC;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 118 "1.2.l"
+#line 117 "flex.l"
 {
         yylval.a=create_node("RC",0,yylineno);
         return RC;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 122 "1.2.l"
+#line 121 "flex.l"
 {}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 123 "1.2.l"
+#line 122 "flex.l"
 {printf("Error type A at Line %d:Mysterious character \"%s\".\n",yylineno,yytext);}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 124 "1.2.l"
+#line 123 "flex.l"
 ECHO;
 	YY_BREAK
-#line 1039 "lex.yy.c"
+#line 1038 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2044,7 +2043,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 124 "1.2.l"
+#line 123 "flex.l"
 
 
 

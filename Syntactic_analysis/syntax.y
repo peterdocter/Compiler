@@ -222,7 +222,7 @@ void print_tree(struct node *head,int leavel)
         }
         if(head->line!=-1)
         {
-            printf("%s (%d)",head->name,head->line);
+            printf("%s",head->name);
             if((strcmp(head->name,"ID")==0)||(strcmp(head->name,"TYPE")==0))
             {
                 printf(":%s",head->string);
@@ -234,6 +234,9 @@ void print_tree(struct node *head,int leavel)
             else if(strcmp(head->name,"FLOAT")==0)
             {
                 printf(":%f ",head->float_value );
+            }
+            else{
+                printf("(%d)",head->line);
             }
         }
         printf("\n",head->line);

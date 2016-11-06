@@ -31,7 +31,7 @@ ELSE "else"
 WHILE "while"
 EMPTY [ \t]+
 %%
-\n  {++num_lines;}
+\n  {}
 {STRUCT} {
             yylval.a=create_node("STRUCT",0,yylineno);
             return STRUCT;
