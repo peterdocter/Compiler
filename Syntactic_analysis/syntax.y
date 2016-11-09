@@ -1,5 +1,4 @@
 %{
- #include<stdio.h>
  #include<stdlib.h>
  #include<stdarg.h>
  #include<string.h>
@@ -18,9 +17,18 @@
      };
  };
 
- struct node* create_node(char *name,int num,...);
- void print_tree(struct node *head,int leavel);
+struct List
+{
+    char *type;
+    char *value;
+    struct List *next;
+};
+struct node* create_node(char *name,int num,...);
+void print_list();
+void print_tree(struct node *head,int leavel);
+FILE* file= fopen("output.txt","a+");
 %}
+
 
 %union{
     struct node* a;
@@ -74,7 +82,7 @@ Tag: ID {$$=create_node("Tag",1,$1);}
 
 VarDec: ID {$$=create_node("VarDec",1,$1);}
  | VarDec LB INT RB {$$=create_node("VarDec",4,$1,$2,$3,$4);}
- | error RB{yyerror("Miss ]");}
+ | error RB{yyerror("Missing ]");}
  ;
 
 FunDec: ID LP VarList RP {$$=create_node("FunDec",4,$1,$2,$3,$4);}
@@ -89,7 +97,7 @@ ParamDec: Specifier VarDec {$$=create_node("ParamDec",2,$1,$2);}
  ;
 
 CompSt: LC DefList StmtList RC {$$=create_node("CompSt",4,$1,$2,$3,$4);}
- | error RC {yyerror("Miss }");}
+ | error RC {yyerror("Missing }");}
  ;
 
 StmtList: Stmt StmtList {$$=create_node("StmtList",2,$1,$2);}
@@ -102,7 +110,7 @@ Stmt: Exp SEMI {$$=create_node("Stmt",2,$1,$2);}
  | IF LP Exp RP Stmt {$$=create_node("Stmt",5,$1,$2,$3,$4,$5);}
  | IF LP Exp RP Stmt ELSE Stmt {$$=create_node("Stmt",7,$1,$2,$3,$4,$5,$6,$7);}
  | WHILE LP Exp RP Stmt {$$=create_node("Stmt",5,$1,$2,$3,$4,$5);}
- | error SEMI {yyerror("Miss ;");}
+ | error SEMI {yyerror("Missing ;");}
  ;
 
 DefList: Def DefList  {$$=create_node("DefList",2,$1,$2);}
@@ -138,7 +146,7 @@ Exp: Exp ASSIGNOP Exp {$$=create_node("Exp",3,$1,$2,$3);}
  | ID {$$=create_node("Exp",1,$1);}
  | INT {$$=create_node("Exp",1,$1);}
  | FLOAT {$$=create_node("Exp",1,$1);}
- | error RP{yyerror("Miss )");}
+ | error RP{yyerror("Missing )");}
  ;
 
 Args: Exp COMMA Args {$$=create_node("Args",3,$1,$2,$3);}
@@ -146,6 +154,7 @@ Args: Exp COMMA Args {$$=create_node("Args",3,$1,$2,$3);}
  ;
 %%
 #include "lex.yy.c"
+#include<stdio.h>
 int main(int argc, char const *argv[])
 {
     if(argc>1)
@@ -159,12 +168,15 @@ int main(int argc, char const *argv[])
         //yydebug=1;
         yyrestart(f);
         yyparse();
+        print_list();
+        fclose(file);
         return 0;
     }
     yyparse();
+    print_list();
+    fclose(file);
     return 0;
 }
-
 
 struct node * create_node(char *name,int num,...)
 {
@@ -192,7 +204,7 @@ struct node * create_node(char *name,int num,...)
     }
     else
     {
-        int line=va_arg(valist,int);
+        int line=va_arg(valist, int);
         head->line=line;
         if((strcmp(head->name,"ID")==0)||(strcmp(head->name,"TYPE")==0))
         {
@@ -213,14 +225,27 @@ struct node * create_node(char *name,int num,...)
             }
             else
                 value=atoi(yytext);
+            char *string=(char*)malloc(strlen(yytext)+1);
+            strcpy(string,yytext);
             head->int_value=value;
         }
         else if(strcmp(head->name,"FLOAT")==0)
         {
-            head->float_value=atof(yytext);
+            char *string=(char*)malloc(strlen(yytext)+1);
+            strcpy(string,yytext);
         }
     }
     return head;
+}
+
+void print_list()
+{
+    struct List *p=List_head;
+    while(p->next!=NULL)
+    {
+        p=p->next;
+        printf("<%s,%s>\n",p->type,p->value);
+    }
 }
 
 void print_tree(struct node *head,int leavel)
@@ -232,25 +257,32 @@ void print_tree(struct node *head,int leavel)
             for(int i=0;i<leavel;++i)
             {
                 printf("  ");
+                fprintf(file, "%s","  ");
             }
             printf("%s",head->name);
+            fprintf(file, "%s",head->name);
             if((strcmp(head->name,"ID")==0)||(strcmp(head->name,"TYPE")==0))
             {
                 printf(":%s",head->string);
+                fprintf(file, ":%s",head->string);
             }
             else if(strcmp(head->name,"INT")==0)
             {
                 printf(":%d ",head->int_value );
+                fprintf(file, ":%d",head->int_value);
             }
             else if(strcmp(head->name,"FLOAT")==0)
             {
                 printf(":%f ",head->float_value );
+                fprintf(file, "%f",head->float_value);
             }
             else
             {
                 printf("(%d)",head->line);
+                fprintf(file, "(%d)",head->line);
             }
             printf("\n");
+            fprintf(file, "%s","\n");
         }
         print_tree(head->left,leavel+1);
         print_tree(head->right,leavel);

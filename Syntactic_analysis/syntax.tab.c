@@ -130,7 +130,6 @@
 /* Copy the first part of user declarations.  */
 #line 1 "syntax.y"
 
- #include<stdio.h>
  #include<stdlib.h>
  #include<stdarg.h>
  #include<string.h>
@@ -149,8 +148,15 @@
      };
  };
 
- struct node* create_node(char *name,int num,...);
- void print_tree(struct node *head,int leavel);
+struct List
+{
+    char *type;
+    char *value;
+    struct List *next;
+};
+struct node* create_node(char *name,int num,...);
+void print_list();
+void print_tree(struct node *head,int leavel);
 
 
 /* Enabling traces.  */
@@ -173,12 +179,12 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 25 "syntax.y"
+#line 32 "syntax.y"
 {
     struct node* a;
 }
 /* Line 193 of yacc.c.  */
-#line 182 "syntax.tab.c"
+#line 188 "syntax.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -191,7 +197,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 195 "syntax.tab.c"
+#line 201 "syntax.tab.c"
 
 #ifdef short
 # undef short
@@ -502,13 +508,13 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    44,    44,    47,    48,    51,    52,    53,    56,    57,
-      60,    61,    64,    65,    68,    69,    72,    75,    76,    77,
-      80,    81,    84,    85,    88,    91,    92,    95,    96,    99,
-     100,   101,   102,   103,   104,   105,   108,   109,   112,   115,
-     116,   119,   120,   123,   124,   125,   126,   127,   128,   129,
-     130,   131,   132,   133,   134,   135,   136,   137,   138,   139,
-     140,   141,   144,   145
+       0,    51,    51,    54,    55,    58,    59,    60,    63,    64,
+      67,    68,    71,    72,    75,    76,    79,    82,    83,    84,
+      87,    88,    91,    92,    95,    98,    99,   102,   103,   106,
+     107,   108,   109,   110,   111,   112,   115,   116,   119,   122,
+     123,   126,   127,   130,   131,   132,   133,   134,   135,   136,
+     137,   138,   139,   140,   141,   142,   143,   144,   145,   146,
+     147,   148,   151,   152
 };
 #endif
 
@@ -1509,318 +1515,318 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 44 "syntax.y"
+#line 51 "syntax.y"
     {(yyval.a)=create_node("Program",1,(yyvsp[(1) - (1)].a));print_tree((yyval.a),0);;}
     break;
 
   case 3:
-#line 47 "syntax.y"
+#line 54 "syntax.y"
     {(yyval.a)=create_node("ExtDefList",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
     break;
 
   case 4:
-#line 48 "syntax.y"
+#line 55 "syntax.y"
     {(yyval.a)=create_node("ExtDefList",0,-1);;}
     break;
 
   case 5:
-#line 51 "syntax.y"
+#line 58 "syntax.y"
     {(yyval.a)=create_node("ExtDef",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 6:
-#line 52 "syntax.y"
+#line 59 "syntax.y"
     {(yyval.a)=create_node("ExtDef",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
     break;
 
   case 7:
-#line 53 "syntax.y"
+#line 60 "syntax.y"
     {(yyval.a)=create_node("ExtDef",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 8:
-#line 56 "syntax.y"
+#line 63 "syntax.y"
     {(yyval.a)=create_node("ExtDecList",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 9:
-#line 57 "syntax.y"
+#line 64 "syntax.y"
     {(yyval.a)=create_node("ExtDecList",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 10:
-#line 60 "syntax.y"
+#line 67 "syntax.y"
     {(yyval.a)=create_node("Specifier",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 11:
-#line 61 "syntax.y"
+#line 68 "syntax.y"
     {(yyval.a)=create_node("Specifier",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 12:
-#line 64 "syntax.y"
+#line 71 "syntax.y"
     {(yyval.a)=create_node("StructSpecifier",5,(yyvsp[(1) - (5)].a),(yyvsp[(2) - (5)].a),(yyvsp[(3) - (5)].a),(yyvsp[(4) - (5)].a),(yyvsp[(5) - (5)].a));;}
     break;
 
   case 13:
-#line 65 "syntax.y"
+#line 72 "syntax.y"
     {(yyval.a)=create_node("StructSpecifier",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
     break;
 
   case 14:
-#line 68 "syntax.y"
+#line 75 "syntax.y"
     {(yyval.a)=create_node("OptTag",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 15:
-#line 69 "syntax.y"
+#line 76 "syntax.y"
     {(yyval.a)=create_node("OptTag",0,-1);;}
     break;
 
   case 16:
-#line 72 "syntax.y"
+#line 79 "syntax.y"
     {(yyval.a)=create_node("Tag",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 17:
-#line 75 "syntax.y"
+#line 82 "syntax.y"
     {(yyval.a)=create_node("VarDec",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 18:
-#line 76 "syntax.y"
+#line 83 "syntax.y"
     {(yyval.a)=create_node("VarDec",4,(yyvsp[(1) - (4)].a),(yyvsp[(2) - (4)].a),(yyvsp[(3) - (4)].a),(yyvsp[(4) - (4)].a));;}
     break;
 
   case 19:
-#line 77 "syntax.y"
-    {yyerror("Miss ]");;}
+#line 84 "syntax.y"
+    {yyerror("Missing ]");;}
     break;
 
   case 20:
-#line 80 "syntax.y"
+#line 87 "syntax.y"
     {(yyval.a)=create_node("FunDec",4,(yyvsp[(1) - (4)].a),(yyvsp[(2) - (4)].a),(yyvsp[(3) - (4)].a),(yyvsp[(4) - (4)].a));;}
     break;
 
   case 21:
-#line 81 "syntax.y"
+#line 88 "syntax.y"
     {(yyval.a)=create_node("FunDec",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 22:
-#line 84 "syntax.y"
+#line 91 "syntax.y"
     {(yyval.a)=create_node("VarList",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 23:
-#line 85 "syntax.y"
+#line 92 "syntax.y"
     {(yyval.a)=create_node("VarList",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 24:
-#line 88 "syntax.y"
+#line 95 "syntax.y"
     {(yyval.a)=create_node("ParamDec",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
     break;
 
   case 25:
-#line 91 "syntax.y"
+#line 98 "syntax.y"
     {(yyval.a)=create_node("CompSt",4,(yyvsp[(1) - (4)].a),(yyvsp[(2) - (4)].a),(yyvsp[(3) - (4)].a),(yyvsp[(4) - (4)].a));;}
     break;
 
   case 26:
-#line 92 "syntax.y"
-    {yyerror("Miss }");;}
+#line 99 "syntax.y"
+    {yyerror("Missing }");;}
     break;
 
   case 27:
-#line 95 "syntax.y"
+#line 102 "syntax.y"
     {(yyval.a)=create_node("StmtList",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
     break;
 
   case 28:
-#line 96 "syntax.y"
+#line 103 "syntax.y"
     {(yyval.a)=create_node("StmtList",0,-1);;}
     break;
 
   case 29:
-#line 99 "syntax.y"
+#line 106 "syntax.y"
     {(yyval.a)=create_node("Stmt",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
     break;
 
   case 30:
-#line 100 "syntax.y"
+#line 107 "syntax.y"
     {(yyval.a)=create_node("Stmt",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 31:
-#line 101 "syntax.y"
+#line 108 "syntax.y"
     {(yyval.a)=create_node("Stmt",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 32:
-#line 102 "syntax.y"
+#line 109 "syntax.y"
     {(yyval.a)=create_node("Stmt",5,(yyvsp[(1) - (5)].a),(yyvsp[(2) - (5)].a),(yyvsp[(3) - (5)].a),(yyvsp[(4) - (5)].a),(yyvsp[(5) - (5)].a));;}
     break;
 
   case 33:
-#line 103 "syntax.y"
+#line 110 "syntax.y"
     {(yyval.a)=create_node("Stmt",7,(yyvsp[(1) - (7)].a),(yyvsp[(2) - (7)].a),(yyvsp[(3) - (7)].a),(yyvsp[(4) - (7)].a),(yyvsp[(5) - (7)].a),(yyvsp[(6) - (7)].a),(yyvsp[(7) - (7)].a));;}
     break;
 
   case 34:
-#line 104 "syntax.y"
+#line 111 "syntax.y"
     {(yyval.a)=create_node("Stmt",5,(yyvsp[(1) - (5)].a),(yyvsp[(2) - (5)].a),(yyvsp[(3) - (5)].a),(yyvsp[(4) - (5)].a),(yyvsp[(5) - (5)].a));;}
     break;
 
   case 35:
-#line 105 "syntax.y"
-    {yyerror("Miss ;");;}
+#line 112 "syntax.y"
+    {yyerror("Missing ;");;}
     break;
 
   case 36:
-#line 108 "syntax.y"
+#line 115 "syntax.y"
     {(yyval.a)=create_node("DefList",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
     break;
 
   case 37:
-#line 109 "syntax.y"
+#line 116 "syntax.y"
     {(yyval.a)=create_node("DefList",0,-1);;}
     break;
 
   case 38:
-#line 112 "syntax.y"
+#line 119 "syntax.y"
     {(yyval.a)=create_node("Def",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 39:
-#line 115 "syntax.y"
+#line 122 "syntax.y"
     {(yyval.a)=create_node("DecList",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 40:
-#line 116 "syntax.y"
+#line 123 "syntax.y"
     {(yyval.a)=create_node("DecList",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 41:
-#line 119 "syntax.y"
+#line 126 "syntax.y"
     {(yyval.a)=create_node("Dec",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 42:
-#line 120 "syntax.y"
+#line 127 "syntax.y"
     {(yyval.a)=create_node("Dec",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 43:
-#line 123 "syntax.y"
-    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
-    break;
-
-  case 44:
-#line 124 "syntax.y"
-    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
-    break;
-
-  case 45:
-#line 125 "syntax.y"
-    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
-    break;
-
-  case 46:
-#line 126 "syntax.y"
-    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
-    break;
-
-  case 47:
-#line 127 "syntax.y"
-    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
-    break;
-
-  case 48:
-#line 128 "syntax.y"
-    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
-    break;
-
-  case 49:
-#line 129 "syntax.y"
-    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
-    break;
-
-  case 50:
 #line 130 "syntax.y"
     {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 51:
+  case 44:
 #line 131 "syntax.y"
     {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 52:
+  case 45:
 #line 132 "syntax.y"
-    {(yyval.a)=create_node("Exp",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
+    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 53:
+  case 46:
 #line 133 "syntax.y"
-    {(yyval.a)=create_node("Exp",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
+    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 54:
+  case 47:
 #line 134 "syntax.y"
-    {(yyval.a)=create_node("Exp",4,(yyvsp[(1) - (4)].a),(yyvsp[(2) - (4)].a),(yyvsp[(3) - (4)].a),(yyvsp[(4) - (4)].a));;}
+    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 55:
+  case 48:
 #line 135 "syntax.y"
     {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 56:
+  case 49:
 #line 136 "syntax.y"
-    {(yyval.a)=create_node("Exp",4,(yyvsp[(1) - (4)].a),(yyvsp[(2) - (4)].a),(yyvsp[(3) - (4)].a),(yyvsp[(4) - (4)].a));;}
+    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 57:
+  case 50:
 #line 137 "syntax.y"
     {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
-  case 58:
+  case 51:
 #line 138 "syntax.y"
+    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
+    break;
+
+  case 52:
+#line 139 "syntax.y"
+    {(yyval.a)=create_node("Exp",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
+    break;
+
+  case 53:
+#line 140 "syntax.y"
+    {(yyval.a)=create_node("Exp",2,(yyvsp[(1) - (2)].a),(yyvsp[(2) - (2)].a));;}
+    break;
+
+  case 54:
+#line 141 "syntax.y"
+    {(yyval.a)=create_node("Exp",4,(yyvsp[(1) - (4)].a),(yyvsp[(2) - (4)].a),(yyvsp[(3) - (4)].a),(yyvsp[(4) - (4)].a));;}
+    break;
+
+  case 55:
+#line 142 "syntax.y"
+    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
+    break;
+
+  case 56:
+#line 143 "syntax.y"
+    {(yyval.a)=create_node("Exp",4,(yyvsp[(1) - (4)].a),(yyvsp[(2) - (4)].a),(yyvsp[(3) - (4)].a),(yyvsp[(4) - (4)].a));;}
+    break;
+
+  case 57:
+#line 144 "syntax.y"
+    {(yyval.a)=create_node("Exp",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
+    break;
+
+  case 58:
+#line 145 "syntax.y"
     {(yyval.a)=create_node("Exp",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 59:
-#line 139 "syntax.y"
+#line 146 "syntax.y"
     {(yyval.a)=create_node("Exp",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 60:
-#line 140 "syntax.y"
+#line 147 "syntax.y"
     {(yyval.a)=create_node("Exp",1,(yyvsp[(1) - (1)].a));;}
     break;
 
   case 61:
-#line 141 "syntax.y"
-    {yyerror("Miss )");;}
+#line 148 "syntax.y"
+    {yyerror("Missing )");;}
     break;
 
   case 62:
-#line 144 "syntax.y"
+#line 151 "syntax.y"
     {(yyval.a)=create_node("Args",3,(yyvsp[(1) - (3)].a),(yyvsp[(2) - (3)].a),(yyvsp[(3) - (3)].a));;}
     break;
 
   case 63:
-#line 145 "syntax.y"
+#line 152 "syntax.y"
     {(yyval.a)=create_node("Args",1,(yyvsp[(1) - (1)].a));;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1824 "syntax.tab.c"
+#line 1830 "syntax.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2034,9 +2040,10 @@ yyreturn:
 }
 
 
-#line 147 "syntax.y"
+#line 154 "syntax.y"
 
 #include "lex.yy.c"
+#include<stdio.h>
 int main(int argc, char const *argv[])
 {
     if(argc>1)
@@ -2050,12 +2057,13 @@ int main(int argc, char const *argv[])
         //yydebug=1;
         yyrestart(f);
         yyparse();
+        print_list();
         return 0;
     }
     yyparse();
+    print_list();
     return 0;
 }
-
 
 struct node * create_node(char *name,int num,...)
 {
@@ -2083,7 +2091,7 @@ struct node * create_node(char *name,int num,...)
     }
     else
     {
-        int line=va_arg(valist,int);
+        int line=va_arg(valist, int);
         head->line=line;
         if((strcmp(head->name,"ID")==0)||(strcmp(head->name,"TYPE")==0))
         {
@@ -2104,18 +2112,32 @@ struct node * create_node(char *name,int num,...)
             }
             else
                 value=atoi(yytext);
+            char *string=(char*)malloc(strlen(yytext)+1);
+            strcpy(string,yytext);
             head->int_value=value;
         }
         else if(strcmp(head->name,"FLOAT")==0)
         {
-            head->float_value=atof(yytext);
+            char *string=(char*)malloc(strlen(yytext)+1);
+            strcpy(string,yytext);
         }
     }
     return head;
 }
 
+void print_list()
+{
+    struct List *p=List_head;
+    while(p->next!=NULL)
+    {
+        p=p->next;
+        printf("<%s,%s>\n",p->type,p->value);
+    }
+}
+
 void print_tree(struct node *head,int leavel)
 {
+    FILE* file= fopen("output.txt","a+");
     if(head!=NULL)
     {
         if(head->line!=-1)
@@ -2123,29 +2145,37 @@ void print_tree(struct node *head,int leavel)
             for(int i=0;i<leavel;++i)
             {
                 printf("  ");
+                fprintf(file, "%s","  ");
             }
             printf("%s",head->name);
+            fprintf(file, "%s",head->name);
             if((strcmp(head->name,"ID")==0)||(strcmp(head->name,"TYPE")==0))
             {
                 printf(":%s",head->string);
+                fprintf(file, ":%s",head->string);
             }
             else if(strcmp(head->name,"INT")==0)
             {
                 printf(":%d ",head->int_value );
+                fprintf(file, ":%d",head->int_value);
             }
             else if(strcmp(head->name,"FLOAT")==0)
             {
                 printf(":%f ",head->float_value );
+                fprintf(file, "%f",head->float_value);
             }
             else
             {
                 printf("(%d)",head->line);
+                fprintf(file, "(%d)",head->line);
             }
             printf("\n");
+            fprintf(file, "%s","\n");
         }
         print_tree(head->left,leavel+1);
         print_tree(head->right,leavel);
     }
+    fclose(file);
 }
 
 yyerror(char *msg)
