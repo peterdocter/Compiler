@@ -74,12 +74,11 @@ Tag: ID {$$=create_node("Tag",1,$1);}
 
 VarDec: ID {$$=create_node("VarDec",1,$1);}
  | VarDec LB INT RB {$$=create_node("VarDec",4,$1,$2,$3,$4);}
- | error {yyerror("Miss ]")}
+ | error RB{yyerror("Miss ]");}
  ;
 
 FunDec: ID LP VarList RP {$$=create_node("FunDec",4,$1,$2,$3,$4);}
  | ID LP RP {$$=create_node("FunDec",3,$1,$2,$3);}
- | error RP {yyerror("Miss )");}
  ;
 
 VarList: ParamDec COMMA VarList {$$=create_node("VarList",3,$1,$2,$3);}
@@ -90,7 +89,7 @@ ParamDec: Specifier VarDec {$$=create_node("ParamDec",2,$1,$2);}
  ;
 
 CompSt: LC DefList StmtList RC {$$=create_node("CompSt",4,$1,$2,$3,$4);}
-    | error RC {yyerror("Miss }");}
+ | error RC {yyerror("Miss }");}
  ;
 
 StmtList: Stmt StmtList {$$=create_node("StmtList",2,$1,$2);}
@@ -139,6 +138,7 @@ Exp: Exp ASSIGNOP Exp {$$=create_node("Exp",3,$1,$2,$3);}
  | ID {$$=create_node("Exp",1,$1);}
  | INT {$$=create_node("Exp",1,$1);}
  | FLOAT {$$=create_node("Exp",1,$1);}
+ | error RP{yyerror("Miss )");}
  ;
 
 Args: Exp COMMA Args {$$=create_node("Args",3,$1,$2,$3);}
@@ -161,11 +161,11 @@ int main(int argc, char const *argv[])
         yyparse();
         return 0;
     }
-    /*
     yyparse();
     return 0;
-    */
 }
+
+
 struct node * create_node(char *name,int num,...)
 {
     va_list valist;
@@ -202,7 +202,18 @@ struct node * create_node(char *name,int num,...)
         }
         else if(strcmp(head->name,"INT")==0)
         {
-            head->int_value=atoi(yytext);
+            int value;
+            if(strlen(yytext)>1&&yytext[0]=='0'&&yytext[1]!='x')
+            {
+                sscanf(yytext,"%o",&value);
+            }
+            else if(strlen(yytext)>1&&yytext[1]=='x')
+            {
+                sscanf(yytext,"%X",&value);
+            }
+            else
+                value=atoi(yytext);
+            head->int_value=value;
         }
         else if(strcmp(head->name,"FLOAT")==0)
         {
@@ -216,12 +227,12 @@ void print_tree(struct node *head,int leavel)
 {
     if(head!=NULL)
     {
-        for(int i=0;i<leavel;++i)
-        {
-            printf("  ");
-        }
         if(head->line!=-1)
         {
+            for(int i=0;i<leavel;++i)
+            {
+                printf("  ");
+            }
             printf("%s",head->name);
             if((strcmp(head->name,"ID")==0)||(strcmp(head->name,"TYPE")==0))
             {
@@ -235,11 +246,12 @@ void print_tree(struct node *head,int leavel)
             {
                 printf(":%f ",head->float_value );
             }
-            else{
+            else
+            {
                 printf("(%d)",head->line);
             }
+            printf("\n");
         }
-        printf("\n",head->line);
         print_tree(head->left,leavel+1);
         print_tree(head->right,leavel);
     }

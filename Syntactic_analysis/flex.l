@@ -2,8 +2,8 @@
     #include "syntax.tab.h"
 %}
 %option yylineno
-INT ([1-9][0-9]{0,31})|0
-FLOAT [0-9]+\.[0-9]+
+INT ([1-9][0-9]{0,31})|0|0x[0-9A-F]+|0[0-7]+
+FLOAT ([0-9]+\.[0-9]+)|(1\.[0-9]+e-[1-9][0-9]*)
 ID [a-zA-Z_][0-9a-zA-Z_]*
 SEMI ";"
 COMMA ","
