@@ -11,10 +11,8 @@ struct ast
      int tag;////1为变量，2为函数，3为常数,4为数组，5为结构体
      char *content;//yytext值
      char *type;//类型
-     union{
-         float value;//float 值
-         float int_value;
-     }
+     float value;//float 值
+     int int_value;
 };
 
 struct var//变量符号表节点
@@ -46,10 +44,10 @@ struct struc
     char *name;
     char *type;
     struct struc *next;
-}*struchead,*stuctail;
+}*struchead,*structail;
 
 struct ast *create_ast(char *name,int num,...);
-void eval(struct *ast,nt leavel);
+void eval(struct ast*,int leavel);
 
 void newvar(int num,...);
 int existvar(struct ast *p);
