@@ -1,6 +1,6 @@
 %{
     #include "gramtree.h"
-    #include "syntax.tab.h"
+    #include "gramtree.tab.h"
 %}
 %option yylineno
 INT ([1-9][0-9]{0,31})|0|0x[0-9A-F]+|0[0-7]+
