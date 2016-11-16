@@ -2,7 +2,9 @@
  #include<stdlib.h>
  #include<stdarg.h>
  #include<string.h>
+ #include<stdio.h>
  #define YYDEBUG 1
+ #define YYERROR_VERBOSE 1
  struct node
  {
      int line;
@@ -26,9 +28,8 @@ struct List
 struct node* create_node(char *name,int num,...);
 void print_list();
 void print_tree(struct node *head,int leavel);
-FILE* file= fopen("output.txt","a+");
+FILE* file;
 %}
-
 
 %union{
     struct node* a;
@@ -82,11 +83,12 @@ Tag: ID {$$=create_node("Tag",1,$1);}
 
 VarDec: ID {$$=create_node("VarDec",1,$1);}
  | VarDec LB INT RB {$$=create_node("VarDec",4,$1,$2,$3,$4);}
- | error RB{yyerror("Missing ]");}
+ | error RB{}
  ;
 
 FunDec: ID LP VarList RP {$$=create_node("FunDec",4,$1,$2,$3,$4);}
  | ID LP RP {$$=create_node("FunDec",3,$1,$2,$3);}
+ | error RP{}
  ;
 
 VarList: ParamDec COMMA VarList {$$=create_node("VarList",3,$1,$2,$3);}
@@ -97,7 +99,6 @@ ParamDec: Specifier VarDec {$$=create_node("ParamDec",2,$1,$2);}
  ;
 
 CompSt: LC DefList StmtList RC {$$=create_node("CompSt",4,$1,$2,$3,$4);}
- | error RC {yyerror("Missing }");}
  ;
 
 StmtList: Stmt StmtList {$$=create_node("StmtList",2,$1,$2);}
@@ -110,7 +111,7 @@ Stmt: Exp SEMI {$$=create_node("Stmt",2,$1,$2);}
  | IF LP Exp RP Stmt {$$=create_node("Stmt",5,$1,$2,$3,$4,$5);}
  | IF LP Exp RP Stmt ELSE Stmt {$$=create_node("Stmt",7,$1,$2,$3,$4,$5,$6,$7);}
  | WHILE LP Exp RP Stmt {$$=create_node("Stmt",5,$1,$2,$3,$4,$5);}
- | error SEMI {yyerror("Missing ;");}
+ | error SEMI{}
  ;
 
 DefList: Def DefList  {$$=create_node("DefList",2,$1,$2);}
@@ -146,7 +147,7 @@ Exp: Exp ASSIGNOP Exp {$$=create_node("Exp",3,$1,$2,$3);}
  | ID {$$=create_node("Exp",1,$1);}
  | INT {$$=create_node("Exp",1,$1);}
  | FLOAT {$$=create_node("Exp",1,$1);}
- | error RP{yyerror("Missing )");}
+ | error{yyerrok;}
  ;
 
 Args: Exp COMMA Args {$$=create_node("Args",3,$1,$2,$3);}
@@ -157,6 +158,7 @@ Args: Exp COMMA Args {$$=create_node("Args",3,$1,$2,$3);}
 #include<stdio.h>
 int main(int argc, char const *argv[])
 {
+    file=fopen("output.txt","a+");
     if(argc>1)
     {
         FILE * f= fopen(argv[1],"r");
@@ -247,7 +249,6 @@ void print_list()
         printf("<%s,%s>\n",p->type,p->value);
     }
 }
-
 void print_tree(struct node *head,int leavel)
 {
     if(head!=NULL)
