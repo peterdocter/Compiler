@@ -18,7 +18,7 @@ void parser(struct ast *p)
 {
     if(p==NULL||p->line==-1)
         return;
-    printf("%s\n",p->name);
+    //printf("%s\n",p->name);
     if(strcmp(p->name,"Specifier")==0)
     {
         struct ast *right=p->right;
@@ -33,6 +33,7 @@ void parser(struct ast *p)
                 func_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
                 func_tail=func_tail->next;
                 func_tail->next=NULL;
+                func_tail->tag=3;
                 func_tail->pnum=0;
                 strcpy(func_tail->rtype,p->type);
                 strcpy(func_tail->name,right->content);
@@ -47,21 +48,46 @@ void parser(struct ast *p)
             {
                 if(strcmp(left->name,"VarDec")==0)
                 {
-                    if(in_symbol_table(left,0)!=NULL)
+                    if(strcmp(left->left->name,"ID")==0)
                     {
-                        printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
+                        if(in_symbol_table(left,0)!=NULL)
+                        {
+                            printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
+                        }
+                        else{
+                            var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                            var_tail=var_tail->next;
+                            var_tail->tag=1;
+                            var_tail->next=NULL;
+                            strcpy(var_tail->type,p->type);
+                            strcpy(var_tail->name,left->content);
+                        }
                     }
-                    else{
-                        var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
-                        var_tail=var_tail->next;
-                        var_tail->next=NULL;
-                        strcpy(var_tail->type,p->type);
-                        strcpy(var_tail->name,right->content);
+                    else
+                    {
+                        if(in_symbol_table(left,1)!=NULL)
+                        {
+                            printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
+                        }
+                        else
+                        {
+                            array_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                            array_tail=array_tail->next;
+                            array_tail->tag=2;
+                            array_tail->next=NULL;
+                            strcpy(array_tail->type,p->type);
+                            strcpy(array_tail->name,left->left->content);
+                        }
                     }
                 }
                 left=left->right;
+                if(left!=NULL)
+                {
+                    left=left->right;
+                    left=left->left;
+                }
             }
-            p=right->left;
+            p=right->right;
         }
         else if(strcmp(right->name,"SEMI")==0)
         {
@@ -73,18 +99,96 @@ void parser(struct ast *p)
             func_tail->pnum+=1;
             var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
             var_tail=var_tail->next;
+            var_tail->tag=1;
             var_tail->next=NULL;
             strcpy(var_tail->type,p->type);
             strcpy(var_tail->name,right->content);
+
         }
-        else if(strcmp(right->name,"DecList"))
+        else if(strcmp(right->name,"DecList")==0)
         {
             //函数内变量定义
+            struct ast *left=right->left;
+            while(left!=NULL)
+            {
+                struct ast *var=left->left;
+                if(strcmp(var->left->name,"ID")==0)
+                {
+                    //变量
+                    if(var->right!=NULL)
+                    {
+                        struct ast *type=var->right->right->left;
+                        if(strcmp(type->name,"ID")==0)
+                        {
+                            struct symbol_node *symbol=in_symbol_table(type,0);
+                            if(symbol!=NULL)
+                            {
+                                printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",type->line,type->content);
+                            }
+                            else
+                            {
+                                if(strcmp(p->type,symbol->type)!=0)
+                                {
+                                    printf("Error type 5 at Line %d: Type mismatched for assignment.\n",left->line);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if(strcmp(p->type,type->type)!=0)
+                            {
+                                printf("Error type 5 at Line %d: Type mismatched for assignment.\n",left->line);
+                            }
+                        }
+                    }
+                    if(in_symbol_table(var,0)!=NULL)
+                    {
+                        printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
+                    }
+                    else{
+                        var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                        var_tail=var_tail->next;
+                        var_tail->tag=1;
+                        var_tail->next=NULL;
+                        strcpy(var_tail->type,p->type);
+                        strcpy(var_tail->name,var->content);
+                    }
+                }
+                else
+                {
+                    //数组
+                    if(in_symbol_table(left,1)!=NULL)
+                    {
+                        printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
+                    }
+                    else
+                    {
+                        array_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                        array_tail=array_tail->next;
+                        array_tail->tag=2;
+                        array_tail->next=NULL;
+                        strcpy(array_tail->type,p->type);
+                        strcpy(array_tail->name,left->left->content);
+                    }
+                }
+                left=left->right;
+                if(left!=NULL)
+                {
+                    left=left->right;
+                    left=left->left;
+                }
+            }
+            p=right->right;
         }
     }
     else if(strcmp(p->name,"CompSt")==0)
     {
-
+        //作用域
+        printf("%s\n",p->name);
+    }
+    else if(strcmp(p->name,"Exp")==0)
+    {
+        printf("%s\n",p->right->name);
     }
     parser(p->left);
     parser(p->right);
