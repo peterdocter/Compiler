@@ -1,4 +1,4 @@
 #!/bin/bash
-bison -d  syntax.y
+bison -d  gramtree.y
 flex flex.l
-gcc syntax.tab.c lex.yy.c gramtree.c -o parser
+gcc  -std=c11 gramtree.tab.c lex.yy.c symboltable.c gramtree.c main.c -o parser
