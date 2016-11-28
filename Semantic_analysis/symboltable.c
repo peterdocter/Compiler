@@ -11,7 +11,7 @@ void build_symbol_table()
     symboltable[3]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     struct_tail=symboltable[3];
     parser(root);
-    eval_symbol_table();
+    //eval_symbol_table();
 }
 
 void parser(struct ast *p)
@@ -24,21 +24,28 @@ void parser(struct ast *p)
         if(strcmp(right->name,"FunDec")==0)
         {
             //函数定义
-            if(in_symbol_table(right,2)!=NULL)
+            if(strcmp(right->right->name,"SEMI")==0)
             {
-                printf("Error type 4 at Line %d: Redefined function \"%s\".\n",right->line,right->content);
+                p=right->right;
             }
-            else{
-                func_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
-                func_tail->next->pre=func_tail;
-                func_tail=func_tail->next;
-                func_tail->next=NULL;
-                func_tail->tag=3;
-                func_tail->pnum=0;
-                strcpy(func_tail->rtype,p->type);
-                strcpy(func_tail->name,right->content);
+            else
+            {
+                if(in_symbol_table(right,2)!=NULL)
+                {
+                    printf("Error type 4 at Line %d: Redefined function \"%s\".\n",right->line,right->content);
+                }
+                else{
+                    func_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                    func_tail->next->pre=func_tail;
+                    func_tail=func_tail->next;
+                    func_tail->next=NULL;
+                    func_tail->tag=3;
+                    func_tail->pnum=0;
+                    strcpy(func_tail->rtype,p->type);
+                    strcpy(func_tail->name,right->content);
+                }
+                p=right;
             }
-            p=right;
         }
         else if(strcmp(right->name,"ExtDecList")==0)
         {
@@ -46,6 +53,15 @@ void parser(struct ast *p)
             struct ast *left=right->left;
             while (left!=NULL)
             {
+                if(strcmp(p->type,"int")!=0&&strcmp(p->type,"float")!=0)
+                {
+                    struct symbol_node *struct_symbol=in_symbol_table(p,3);
+                    if(struct_symbol==NULL)
+                    {
+                        printf("Error type 17 at Line %d: Undefined structure \"%s\".\n",p->line,p->content);
+                        break;
+                    }
+                }
                 if(strcmp(left->name,"VarDec")==0)
                 {
                         if(in_symbol_table(left,0)!=NULL)
@@ -96,74 +112,81 @@ void parser(struct ast *p)
             //结构体定义
             p=p->left->left;
             right=p->right;
-            struct_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
-            struct_tail->next->pre=struct_tail;
-            struct_tail=struct_tail->next;
-            struct_tail->tag=4;
-            struct_tail->next=NULL;
-            strcpy(struct_tail->name,right->left->content);
-            p=right->right->right->left;
-            struct_tail->struct_var=(struct symbol_node*)malloc(sizeof(struct symbol_node));
-            struct symbol_node *struct_var_tail=struct_tail->struct_var;
-            while (p!=NULL)
+            if(in_symbol_table(right->left,-1)!=NULL)
             {
-                if(strcmp(p->name,"Def")==0)
+                printf("Error type 16 at Line %d: Duplicated name \"%s\".\n",p->line,right->left->content);
+            }
+            else
+            {
+                struct_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                struct_tail->next->pre=struct_tail;
+                struct_tail=struct_tail->next;
+                struct_tail->tag=4;
+                struct_tail->next=NULL;
+                strcpy(struct_tail->name,right->left->content);
+                p=right->right->right->left;
+                struct_tail->struct_var=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                struct symbol_node *struct_var_tail=struct_tail->struct_var;
+                while (p!=NULL)
                 {
-                    struct ast *left=p->left;
-                    char specifier_type[30];
-                    strcpy(specifier_type,left->type);
-                    left=left->right->left;
-                    while(left!=NULL)
+                    if(strcmp(p->name,"Def")==0)
                     {
-                        struct ast *var=left->left;
-                        if(strcmp(var->left->name,"ID")==0)
+                        struct ast *left=p->left;
+                        char specifier_type[30];
+                        strcpy(specifier_type,left->type);
+                        left=left->right->left;
+                        while(left!=NULL)
                         {
-                            //变量
-                            if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
+                            struct ast *var=left->left;
+                            if(strcmp(var->left->name,"ID")==0)
                             {
-                                printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
+                                //变量
+                                if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
+                                {
+                                    printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
+                                }
+                                else
+                                {
+                                    struct_var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                                    struct_var_tail->next->pre=struct_var_tail;
+                                    struct_var_tail=struct_var_tail->next;
+                                    struct_var_tail->tag=1;
+                                    struct_var_tail->next=NULL;
+                                    strcpy(struct_var_tail->type,specifier_type);
+                                    strcpy(struct_var_tail->name,var->left->content);
+                                }
                             }
                             else
                             {
-                                struct_var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
-                                struct_var_tail->next->pre=struct_var_tail;
-                                struct_var_tail=struct_var_tail->next;
-                                struct_var_tail->tag=1;
-                                struct_var_tail->next=NULL;
-                                strcpy(struct_var_tail->type,specifier_type);
-                                strcpy(struct_var_tail->name,var->left->content);
+                                //数组
+                                if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
+                                {
+                                    printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
+                                }
+                                else
+                                {
+                                    struct_var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                                    struct_var_tail->next->pre=struct_var_tail;
+                                    struct_var_tail=struct_var_tail->next;
+                                    struct_var_tail->tag=2;
+                                    struct_var_tail->next=NULL;
+                                    strcpy(struct_var_tail->type,specifier_type);
+                                    strcpy(struct_var_tail->name,left->left->content);
+                                }
                             }
-                        }
-                        else
-                        {
-                            //数组
-                            if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
-                            {
-                                printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
-                            }
-                            else
-                            {
-                                struct_var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
-                                struct_var_tail->next->pre=struct_var_tail;
-                                struct_var_tail=struct_var_tail->next;
-                                struct_var_tail->tag=2;
-                                struct_var_tail->next=NULL;
-                                strcpy(struct_var_tail->type,specifier_type);
-                                strcpy(struct_var_tail->name,left->left->content);
-                            }
-                        }
-                        left=left->right;
-                        if(left!=NULL)
-                        {
                             left=left->right;
-                            left=left->left;
+                            if(left!=NULL)
+                            {
+                                left=left->right;
+                                left=left->left;
+                            }
                         }
                     }
-                }
-                p=p->right;
-                if(p!=NULL)
-                {
-                    p=p->left;
+                    p=p->right;
+                    if(p!=NULL)
+                    {
+                        p=p->left;
+                    }
                 }
             }
             p=NULL;
@@ -187,6 +210,15 @@ void parser(struct ast *p)
             struct ast *left=right->left;
             while(left!=NULL)
             {
+                if(strcmp(p->type,"int")!=0&&strcmp(p->type,"float")!=0)
+                {
+                    struct symbol_node *struct_symbol=in_symbol_table(p,3);
+                    if(struct_symbol==NULL)
+                    {
+                        printf("Error type 17 at Line %d: Undefined structure \"%s\".\n",p->line,p->content);
+                        break;
+                    }
+                }
                 struct ast *var=left->left;
                 if(strcmp(var->left->name,"ID")==0)
                 {
@@ -361,7 +393,22 @@ void parser(struct ast *p)
                     struct ast *right_exp=right->right;
                     if(strcmp(right_exp->left->name,"ID")==0)
                     {
-                        printf("%s\n",right_exp->left->name);
+                        struct symbol_node *right_symbol=in_symbol_table(right_exp->left,-1);
+                        if(right_symbol->tag==3)
+                        {
+                            if(strcmp(symbol->type,right_symbol->rtype)!=0)
+                            {
+                                printf("Error type 5 at Line %d: Type mismatched for assignment.\n",p->line);
+                            }
+                        }
+                        else if(right_symbol->tag==1)
+                        {
+                            if(strcmp(symbol->type,right_symbol->rtype)!=0)
+                            {
+                                printf("Error type 5 at Line %d: Type mismatched for assignment.\n",p->line);
+                            }
+                        }
+                        //printf("%s\n",right_exp->left->name);
                     }
                     else if(strcmp(right_exp->left->name,"INT")==0)
                     {
@@ -553,6 +600,50 @@ void parser(struct ast *p)
                 }
             }
         }
+        else if(right!=NULL && strcmp(right->name,"DOT")==0)
+        {
+            //结构体访问
+            if(strcmp(p->left->name,"ID")==0)
+            {
+                struct symbol_node *symbol=in_symbol_table(p->left,-1);
+                if(symbol==NULL)
+                {
+                    printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,p->left->content);
+                }
+                else if(symbol->tag!=1)
+                {
+                    printf("Error type 13 at Line %d: Illegal use of \".\".\n",p->line);
+                }
+                else if(strcmp(symbol->type,"int")==0||strcmp(symbol->type,"float")==0)
+                {
+                    printf("Error type 13 at Line %d: Illegal use of \".\".\n",p->line);
+                }
+                else
+                {
+                    struct symbol_node *struct_symbol_p=symboltable[3]->next;
+                    while(struct_symbol_p!=NULL)
+                    {
+                        if(strcmp(struct_symbol_p->name,symbol->type)==0)
+                        {
+                            break;
+                        }
+                        struct_symbol_p=struct_symbol_p->next;
+                    }
+                    if(struct_symbol_p!=NULL)
+                    {
+                        struct_symbol_p=in_struct_symbol_table(right->right,struct_symbol_p->struct_var);
+                        if(struct_symbol_p==NULL)
+                        {
+                            printf("Error type 14 at Line %d: Non-existent field \"%s\".\n",p->line,right->right->content);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                printf("Error type 13 at Line %d: Illegal use of \".\".\n",p->line);
+            }
+        }
         p=NULL;
     }
     if(p!=NULL)
@@ -616,7 +707,6 @@ void eval_symbol_table()
         struct symbol_node *p=symboltable[i]->next;
         while(p!=NULL)
         {
-            printf("%s-",p->name);
             if(i==2)
             {
                 printf(" %s %d ",p->rtype,p->pnum);

@@ -43,6 +43,9 @@ ExtDef: Specifier ExtDecList SEMI {//变量定义
  | Specifier FunDec CompSt {//函数定义
         $$=create_ast("ExtDef",3,$1,$2,$3);
    }
+ | Specifier FunDec SEMI{
+        $$=create_ast("ExtDef",3,$1,$2,$3);
+   }
  ;
 
 ExtDecList: VarDec {$$=create_ast("ExtDecList",1,$1);}
@@ -64,11 +67,15 @@ Specifier:  TYPE {
 StructSpecifier: STRUCT OptTag LC DefList RC {//结构体定义
         $$=create_ast("StructSpecifier",5,$1,$2,$3,$4,$5);
         $$->type=(char *)malloc(sizeof($2->content)+1);
+        $$->content=(char *)malloc(sizeof($2->content)+1);
+        strcpy($$->content,$2->content);
         strcpy($$->type,$2->content);
     }
  | STRUCT Tag {//结构体
         $$=create_ast("StructSpecifier",2,$1,$2);
         $$->type=(char *)malloc(sizeof($2->content)+1);
+        $$->content=(char *)malloc(sizeof($2->content)+1);
+        strcpy($$->content,$2->content);
         strcpy($$->type,$2->content);
     }
  ;
