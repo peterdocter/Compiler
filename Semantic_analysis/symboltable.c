@@ -94,6 +94,79 @@ void parser(struct ast *p)
         else if(strcmp(right->name,"SEMI")==0)
         {
             //结构体定义
+            p=p->left->left;
+            right=p->right;
+            struct_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+            struct_tail->next->pre=struct_tail;
+            struct_tail=struct_tail->next;
+            struct_tail->tag=4;
+            struct_tail->next=NULL;
+            strcpy(struct_tail->name,right->left->content);
+            p=right->right->right->left;
+            struct_tail->struct_var=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+            struct symbol_node *struct_var_tail=struct_tail->struct_var;
+            while (p!=NULL)
+            {
+                if(strcmp(p->name,"Def")==0)
+                {
+                    struct ast *left=p->left;
+                    char specifier_type[30];
+                    strcpy(specifier_type,left->type);
+                    left=left->right->left;
+                    while(left!=NULL)
+                    {
+                        struct ast *var=left->left;
+                        if(strcmp(var->left->name,"ID")==0)
+                        {
+                            //变量
+                            if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
+                            {
+                                printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
+                            }
+                            else
+                            {
+                                struct_var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                                struct_var_tail->next->pre=struct_var_tail;
+                                struct_var_tail=struct_var_tail->next;
+                                struct_var_tail->tag=1;
+                                struct_var_tail->next=NULL;
+                                strcpy(struct_var_tail->type,specifier_type);
+                                strcpy(struct_var_tail->name,var->left->content);
+                            }
+                        }
+                        else
+                        {
+                            //数组
+                            if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
+                            {
+                                printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
+                            }
+                            else
+                            {
+                                struct_var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+                                struct_var_tail->next->pre=struct_var_tail;
+                                struct_var_tail=struct_var_tail->next;
+                                struct_var_tail->tag=2;
+                                struct_var_tail->next=NULL;
+                                strcpy(struct_var_tail->type,specifier_type);
+                                strcpy(struct_var_tail->name,left->left->content);
+                            }
+                        }
+                        left=left->right;
+                        if(left!=NULL)
+                        {
+                            left=left->right;
+                            left=left->left;
+                        }
+                    }
+                }
+                p=p->right;
+                if(p!=NULL)
+                {
+                    p=p->left;
+                }
+            }
+            p=NULL;
         }
         else if(strcmp(right->name,"VarDec")==0)
         {
@@ -201,30 +274,31 @@ void parser(struct ast *p)
         array_tail=array_tail->next;
         array_tail->tag=2;
         array_tail->next=NULL;
-        strcpy(array_tail->name,"(");
+        strcpy(array_tail->name,"{");
 
         var_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
         var_tail->next->pre=var_tail;
         var_tail=var_tail->next;
         var_tail->tag=1;
         var_tail->next=NULL;
-        strcpy(var_tail->name,"(");
+        strcpy(var_tail->name,"{");
+        p=p->right;
     }
     else if(strcmp(p->name,"RC")==0)
     {
-        while (strcmp(var_tail->name,"(")!=0)
+        while (strcmp(var_tail->name,"{")!=0)
         {
             var_tail=var_tail->pre;
             free(var_tail->next);
             var_tail->next=NULL;
         }
-        while(strcmp(var_tail->name,"(")==0||var_tail->tag==5)
+        while(strcmp(var_tail->name,"{")==0||var_tail->tag==5)
         {
             var_tail=var_tail->pre;
             free(var_tail->next);
             var_tail->next=NULL;
         }
-        while (strcmp(array_tail->name,"(")!=0)
+        while (strcmp(array_tail->name,"{")!=0)
         {
             array_tail=array_tail->pre;
             free(array_tail->next);
@@ -271,6 +345,7 @@ void parser(struct ast *p)
         p=p->left;
         struct ast *left=p->left;
         struct ast *right=p->right;
+        //赋值
         if(right!=NULL && strcmp(right->name,"ASSIGNOP")==0)
         {
             if(strcmp(left->name,"ID")==0)
@@ -313,18 +388,49 @@ void parser(struct ast *p)
                 printf("Error type 6 at Line %d: The left-hand side of an assignment must be a varia- ble.\n",p->line);
             }
         }
+        //函数调用
         else if(strcmp(p->name,"ID")==0&&strcmp(right->name,"LP")==0)
         {
-            struct symbol_node *symbol=in_symbol_table(p,2);
+            struct symbol_node *symbol=in_symbol_table(p,-1);
             if(symbol==NULL)
             {
                 printf("Error type 2 at Line %d: Undefined function \"%s\".\n",p->line,p->content);
             }
+            else if(symbol->tag!=3)
+            {
+                printf("Error type 11 at Line %d: \"%s\" is not a function.\n",p->line,p->content);
+            }
             else
             {
                 //判断参数个数是否正确
+                int num=0;
+                right=right->right;
+                if(strcmp(right->name,"RP")!=0)
+                {
+                    struct ast *arg_p=right->left;
+                    while(arg_p!=NULL)
+                    {
+                        if(strcmp(arg_p->name,"Exp")==0)
+                        {
+                            num+=1;
+                        }
+                        if(strcmp(arg_p->name,"Args")==0)
+                        {
+                            arg_p=arg_p->left;
+                        }
+                        else
+                        {
+                            arg_p=arg_p->right;
+                        }
+                    }
+                }
+                if(symbol->pnum!=num)
+                {
+                    printf("Error type 9 at Line %d: Function \"%s\" is not applicable for arguments\n",right->line,symbol->name);
+                }
             }
         }
+        //基本运算
         else if(right!=NULL && (strcmp(right->name,"PLUS")==0||strcmp(right->name,"MINUS")==0||strcmp(right->name,"STAR")==0||strcmp(right->name,"DIV")==0))
         {
             struct ast *right_exp=right->right->left;
@@ -414,6 +520,39 @@ void parser(struct ast *p)
                 }
             }
         }
+        //数组
+        else if(strcmp(p->left->name,"ID")==0&&strcmp(right->name,"LB")==0)
+        {
+            struct symbol_node *symbol=in_symbol_table(p->left,-1);
+            if(symbol==NULL)
+            {
+                printf("Error type 1 at Line %d: Undefined Array \"%s\".\n",p->line,p->left->content);
+            }
+            else if(symbol->tag!=2)
+            {
+                printf("Error type 10 at Line %d: \"%s\" is not an array.\n", p->line,p->left->content);
+            }
+            else
+            {
+                right=right->right;
+                if(strcmp(right->left->name,"FLOAT")==0)
+                {
+                    printf("Error type 12 at Line %d: \"%f\" is not an integer.\n",p->line,right->left->value);
+                }
+                else if(strcmp(right->left->name,"ID")==0)
+                {
+                    struct symbol_node *symbol_id=in_symbol_table(right->left,-1);
+                    if(symbol_id==NULL)
+                    {
+                        printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,right->left->content);
+                    }
+                    else if(strcmp(symbol_id->type,"int"))
+                    {
+                        printf("Error type 12 at Line %d: \"%s\" is not an integer.\n",p->line,right->left->content);
+                    }
+                }
+            }
+        }
         p=NULL;
     }
     if(p!=NULL)
@@ -425,7 +564,40 @@ void parser(struct ast *p)
 
 struct symbol_node* in_symbol_table(struct ast *p,int index)
 {
-    struct symbol_node *symbol_p=symboltable[index]->next;
+    if(index==-1)
+    {
+        for(int i=0;i<4;++i)
+        {
+            struct symbol_node *symbol_p=symboltable[i]->next;
+            while(symbol_p!=NULL)
+            {
+                if(!strcmp(symbol_p->name,p->content))
+                {
+                    return symbol_p;
+                }
+                symbol_p=symbol_p->next;
+            }
+        }
+    }
+    else
+    {
+        struct symbol_node *symbol_p=symboltable[index]->next;
+        while(symbol_p!=NULL)
+        {
+            if(!strcmp(symbol_p->name,p->content))
+            {
+                return symbol_p;
+            }
+            symbol_p=symbol_p->next;
+        }
+
+    }
+    return NULL;
+}
+
+struct symbol_node * in_struct_symbol_table(struct ast *p,struct symbol_node *struct_symbol)
+{
+    struct symbol_node *symbol_p=struct_symbol->next;
     while(symbol_p!=NULL)
     {
         if(!strcmp(symbol_p->name,p->content))
@@ -452,6 +624,15 @@ void eval_symbol_table()
             else
             {
                 printf(" %s ",p->type);
+            }
+            if(i==3)
+            {
+                struct symbol_node *symbol_p=p->struct_var;
+                while(symbol_p!=NULL)
+                {
+                    printf("%s ",symbol_p->name);
+                    symbol_p=symbol_p->next;
+                }
             }
             p=p->next;
         }

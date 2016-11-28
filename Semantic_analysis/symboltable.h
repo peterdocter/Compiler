@@ -26,3 +26,4 @@ void build_symbol_table();
 void parser(struct ast *p);
 struct symbol_node* in_symbol_table(struct ast *p,int index);
 void  eval_symbol_table();
+struct symbol_node * in_struct_symbol_table(struct ast *p,struct symbol_node *struct_symbol);

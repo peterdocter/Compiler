@@ -15,8 +15,8 @@ int main(int argc, char const *argv[])
         //yydebug=1;
         yyrestart(f);
         yyparse();
-        build_symbol_table();
         eval(root,0);
+        build_symbol_table();
         return 0;
     }
     yyparse();
