@@ -4,8 +4,10 @@ void build_symbol_table()
 {
     symboltable[0]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     var_tail=symboltable[0];
+    var_tail->pre=NULL;
     symboltable[1]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     array_tail=symboltable[1];
+    array_tail->pre=NULL;
     symboltable[2]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     func_tail=symboltable[2];
     symboltable[3]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
@@ -672,10 +674,31 @@ struct symbol_node* in_symbol_table(struct ast *p,int index)
     }
     else
     {
-        struct symbol_node *symbol_p=symboltable[index]->next;
+        struct symbol_node *symbol_p;
+        switch (index) {
+            case 0:
+                symbol_p=var_tail;
+                while(symbol_p!=NULL)
+                {
+                    if(strcmp(symbol_p->name,"{")==0)
+                    {
+                        return NULL;
+                    }
+                    if(strcmp(symbol_p->name,p->content)==0)
+                    {
+                        return symbol_p;
+                    }
+                    symbol_p=symbol_p->pre;
+                }
+                break;
+            case 1:
+                symbol_p=array_tail;
+                break;
+        }
+        symbol_p=symboltable[index];
         while(symbol_p!=NULL)
         {
-            if(!strcmp(symbol_p->name,p->content))
+            if(strcmp(symbol_p->name,p->content)==0)
             {
                 return symbol_p;
             }
@@ -698,35 +721,4 @@ struct symbol_node * in_struct_symbol_table(struct ast *p,struct symbol_node *st
         symbol_p=symbol_p->next;
     }
     return NULL;
-}
-
-void eval_symbol_table()
-{
-    for(int i=0;i<4;++i)
-    {
-        struct symbol_node *p=symboltable[i]->next;
-        while(p!=NULL)
-        {
-            if(i==2)
-            {
-                printf(" %s %d ",p->rtype,p->pnum);
-            }
-            else
-            {
-                printf(" %s ",p->type);
-            }
-            if(i==3)
-            {
-                struct symbol_node *symbol_p=p->struct_var;
-                while(symbol_p!=NULL)
-                {
-                    printf("%s ",symbol_p->name);
-                    symbol_p=symbol_p->next;
-                }
-            }
-            p=p->next;
-        }
-        printf("\n");
-    }
-    printf("---------\n");
 }
