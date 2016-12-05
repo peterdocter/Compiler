@@ -15,8 +15,11 @@ int main(int argc, char const *argv[])
         //yydebug=1;
         yyrestart(f);
         yyparse();
-        //eval(root,0);
+        eval(root,0);
+        init_inter_code();
         build_symbol_table();
+        printf("print_inter_code\n");
+        print_inter_code();
         return 0;
     }
     yyparse();

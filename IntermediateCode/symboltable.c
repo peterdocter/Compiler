@@ -296,7 +296,6 @@ struct ast * parser_Specifier(struct ast *p)
     return p;
 }
 
-
 struct ast * parser_RETURN(struct ast *p)
 {
     struct ast *right=p->right;
@@ -327,13 +326,29 @@ struct ast * parser_RETURN(struct ast *p)
             printf("Error type 8 at Line %d: Type mismatched for return.\n",p->line);
         }
     }
-    p=right;
     return p;
 }
 
 struct ast *parser_Exp(struct ast *p)
 {
     p=p->left;
+    if(!strcmp(p->name,"NOT"))
+    {
+        return NULL;
+    }
+    else if(!strcmp(p->name,"MINUS"))
+    {
+        return NULL;
+    }
+    else if(!strcmp(p->name,"ID"))
+    {
+        struct symbol_node *symbol=in_symbol_table(p,0);
+        if(symbol==NULL)
+        {
+            printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,p->content);
+        }
+        return NULL;
+    }
     struct ast *left=p->left;
     struct ast *right=p->right;
     //赋值
@@ -362,12 +377,11 @@ struct ast *parser_Exp(struct ast *p)
                     }
                     else if(right_symbol->tag==1)
                     {
-                        if(strcmp(symbol->type,right_symbol->rtype)!=0)
+                        if(strcmp(symbol->type,right_symbol->type)!=0)
                         {
                             printf("Error type 5 at Line %d: Type mismatched for assignment.\n",p->line);
                         }
                     }
-                    //printf("%s\n",right_exp->left->name);
                 }
                 else if(strcmp(right_exp->left->name,"INT")==0)
                 {
@@ -393,6 +407,8 @@ struct ast *parser_Exp(struct ast *p)
         {
             printf("Error type 6 at Line %d: The left-hand side of an assignment must be a varia- ble.\n",p->line);
         }
+
+
     }
     //函数调用
     else if(strcmp(p->name,"ID")==0&&strcmp(right->name,"LP")==0)
@@ -606,10 +622,12 @@ struct ast *parser_Exp(struct ast *p)
     p=NULL;
     return p;
 }
+
 void parser(struct ast *p)
 {
     if(p==NULL||p->line==-1)
         return;
+    printf("%s\n",p->name);
     if(strcmp(p->name,"Specifier")==0)
     {
         p=parser_Specifier(p);
@@ -663,8 +681,17 @@ void parser(struct ast *p)
     {
         p=parser_Exp(p);
     }
+
     if(p!=NULL)
     {
+        if(!strcmp(p->name,"Stmt"))
+        {
+            inter_code_tail->next=translate_Stmt(p->left);
+            while(inter_code_tail->next!=NULL)
+            {
+                inter_code_tail=inter_code_tail->next;
+            }
+        }
         parser(p->left);
         parser(p->right);
     }
@@ -738,13 +765,35 @@ struct symbol_node * in_struct_symbol_table(struct ast *p,struct symbol_node *st
     return NULL;
 }
 
-struct symbol_node* lookup(struct symbol_node *symbol_tail,struct ast *ast_p)
+struct symbol_node* lookup(struct ast *ast_p)
 {
-    struct symbol_node* p=symbol_tail;
+    struct symbol_node* p=var_tail;
     while (p!=NULL)
     {
         if(!strcmp(p->name,ast_p->content))
             return p;
         p=p->pre;
     }
+    p=array_tail;
+    while (p!=NULL)
+    {
+        if(!strcmp(p->name,ast_p->content))
+            return p;
+        p=p->pre;
+    }
+    p=struct_tail;
+    while (p!=NULL)
+    {
+        if(!strcmp(p->name,ast_p->content))
+            return p;
+        p=p->pre;
+    }
+    p=func_tail;
+    while (p!=NULL)
+    {
+        if(!strcmp(p->name,ast_p->content))
+            return p;
+        p=p->pre;
+    }
+    return NULL;
 }
