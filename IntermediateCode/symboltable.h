@@ -23,6 +23,7 @@ struct symbol_node * var_tail;
 struct symbol_node * array_tail;
 struct symbol_node * func_tail;
 struct symbol_node * struct_tail;
+int no_error;
 
 void build_symbol_table();
 void parser(struct ast *p);

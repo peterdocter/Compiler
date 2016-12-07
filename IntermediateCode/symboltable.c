@@ -32,7 +32,8 @@ void build_symbol_table()
 
     symboltable[3]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     struct_tail=symboltable[3];
-    //parser(root);
+    no_error=0;
+    parser(root);
 }
 
 struct ast * parser_Specifier(struct ast *p)
@@ -49,6 +50,7 @@ struct ast * parser_Specifier(struct ast *p)
         {
             if(in_symbol_table(right,2)!=NULL)
             {
+                no_error=1;
                 printf("Error type 4 at Line %d: Redefined function \"%s\".\n",right->line,right->content);
             }
             else{
@@ -61,14 +63,15 @@ struct ast * parser_Specifier(struct ast *p)
                 strcpy(func_tail->rtype,p->type);
                 strcpy(func_tail->name,right->content);
 
-
-                inter_code_tail->next=translate_Func(right);
-                inter_code_tail->next->pre=inter_code_tail;
-                while(inter_code_tail->next!=NULL)
+                if(no_error==0)
                 {
-                    inter_code_tail=inter_code_tail->next;
+                    inter_code_tail->next=translate_Func(right);
+                    inter_code_tail->next->pre=inter_code_tail;
+                    while(inter_code_tail->next!=NULL)
+                    {
+                        inter_code_tail=inter_code_tail->next;
+                    }
                 }
-
             }
             p=right;
         }
@@ -84,6 +87,7 @@ struct ast * parser_Specifier(struct ast *p)
                 struct symbol_node *struct_symbol=in_symbol_table(p,3);
                 if(struct_symbol==NULL)
                 {
+                    no_error=1;
                     printf("Error type 17 at Line %d: Undefined structure \"%s\".\n",p->line,p->content);
                     break;
                 }
@@ -92,6 +96,7 @@ struct ast * parser_Specifier(struct ast *p)
             {
                     if(in_symbol_table(left,0)!=NULL)
                     {
+                        no_error=1;
                         printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
                     }
                     else
@@ -109,6 +114,7 @@ struct ast * parser_Specifier(struct ast *p)
             {
                 if(in_symbol_table(left,1)!=NULL)
                 {
+                    no_error=1;
                     printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
                 }
                 else
@@ -138,6 +144,7 @@ struct ast * parser_Specifier(struct ast *p)
         right=p->right;
         if(in_symbol_table(right->left,-1)!=NULL)
         {
+            no_error=1;
             printf("Error type 16 at Line %d: Duplicated name \"%s\".\n",p->line,right->left->content);
         }
         else
@@ -167,6 +174,7 @@ struct ast * parser_Specifier(struct ast *p)
                             //变量
                             if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
                             {
+                                no_error=1;
                                 printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
                             }
                             else
@@ -185,6 +193,7 @@ struct ast * parser_Specifier(struct ast *p)
                             //数组
                             if(in_struct_symbol_table(var,struct_tail->struct_var)!=NULL)
                             {
+                                no_error=1;
                                 printf("Error type 15 at Line %d: Redefined field \"%s\".\n",p->line,var->content);
                             }
                             else
@@ -227,11 +236,14 @@ struct ast * parser_Specifier(struct ast *p)
         strcpy(var_tail->type,p->type);
         strcpy(var_tail->name,right->content);
 
-        inter_code_tail->next=translate_VarDec(right);
-        inter_code_tail->next->pre=inter_code_tail;
-        while(inter_code_tail->next!=NULL)
+        if(no_error==0)
         {
-            inter_code_tail=inter_code_tail->next;
+            inter_code_tail->next=translate_VarDec(right);
+            inter_code_tail->next->pre=inter_code_tail;
+            while(inter_code_tail->next!=NULL)
+            {
+                inter_code_tail=inter_code_tail->next;
+            }
         }
     }
     else if(strcmp(right->name,"DecList")==0)
@@ -245,6 +257,7 @@ struct ast * parser_Specifier(struct ast *p)
                 struct symbol_node *struct_symbol=in_symbol_table(p,3);
                 if(struct_symbol==NULL)
                 {
+                    no_error=1;
                     printf("Error type 17 at Line %d: Undefined structure \"%s\".\n",p->line,p->content);
                     break;
                 }
@@ -263,11 +276,13 @@ struct ast * parser_Specifier(struct ast *p)
                         {
                             if(strcmp(p->type,symbol->type)!=0)
                             {
+                                no_error=1;
                                 printf("Error type 5 at Line %d: Type mismatched for assignment.\n",left->line);
                             }
                         }
                         else
                         {
+                            no_error=1;
                             printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",left->line,type->content);
                         }
                     }
@@ -275,6 +290,7 @@ struct ast * parser_Specifier(struct ast *p)
                     {
                         if(strcmp(p->type,"int")!=0)
                         {
+                            no_error=1;
                             printf("Error type 5 at Line %d: Type mismatched for assignment.\n",left->line);
                         }
                     }
@@ -282,12 +298,14 @@ struct ast * parser_Specifier(struct ast *p)
                     {
                         if(strcmp(p->type,"float")!=0)
                         {
+                            no_error=1;
                             printf("Error type 5 at Line %d: Type mismatched for assignment.\n",left->line);
                         }
                     }
                 }
                 if(in_symbol_table(var,0)!=NULL)
                 {
+                    no_error=1;
                     printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
                 }
                 else
@@ -306,6 +324,7 @@ struct ast * parser_Specifier(struct ast *p)
                 //数组
                 if(in_symbol_table(left,1)!=NULL)
                 {
+                    no_error=1;
                     printf("Error type 3 at Line %d: Redefined variable \"%s\".\n",left->line,left->content);
                 }
                 else
@@ -340,10 +359,12 @@ struct ast * parser_RETURN(struct ast *p)
         struct symbol_node *symbol=in_symbol_table(left,0);
         if(symbol==NULL)
         {
+            no_error=1;
             printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,left->content);
         }
         else if(strcmp(func_tail->rtype,symbol->type)!=0)
         {
+            no_error=1;
             printf("Error type 8 at Line %d: Type mismatched for return.\n",p->line);
         }
     }
@@ -351,6 +372,7 @@ struct ast * parser_RETURN(struct ast *p)
     {
         if(strcmp(func_tail->rtype,"int")!=0)
         {
+            no_error=1;
             printf("Error type 8 at Line %d: Type mismatched for return.\n",p->line);
         }
     }
@@ -358,6 +380,7 @@ struct ast * parser_RETURN(struct ast *p)
     {
         if(strcmp(func_tail->rtype,"float")!=0)
         {
+            no_error=1;
             printf("Error type 8 at Line %d: Type mismatched for return.\n",p->line);
         }
     }
@@ -380,6 +403,7 @@ struct ast *parser_Exp(struct ast *p)
         struct symbol_node *symbol=in_symbol_table(p,0);
         if(symbol==NULL)
         {
+            no_error=1;
             printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,p->content);
         }
         return NULL;
@@ -399,6 +423,7 @@ struct ast *parser_Exp(struct ast *p)
             struct symbol_node *symbol=in_symbol_table(left,0);
             if(symbol==NULL)
             {
+                no_error=1;
                 printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,left->content);
             }
             else
@@ -412,6 +437,7 @@ struct ast *parser_Exp(struct ast *p)
                     {
                         if(strcmp(symbol->type,right_symbol->rtype)!=0)
                         {
+                            no_error=1;
                             printf("Error type 5 at Line %d: Type mismatched for assignment.\n",p->line);
                         }
                     }
@@ -419,6 +445,7 @@ struct ast *parser_Exp(struct ast *p)
                     {
                         if(strcmp(symbol->type,right_symbol->type)!=0)
                         {
+                            no_error=1;
                             printf("Error type 5 at Line %d: Type mismatched for assignment.\n",p->line);
                         }
                     }
@@ -427,6 +454,7 @@ struct ast *parser_Exp(struct ast *p)
                 {
                     if(strcmp(symbol->type,"int")!=0)
                     {
+                        no_error=1;
                         printf("Error type 5 at Line %d: Type mismatched for assignment.\n",p->line);
                     }
                 }
@@ -434,6 +462,7 @@ struct ast *parser_Exp(struct ast *p)
                 {
                     if(strcmp(symbol->type,"float")!=0)
                     {
+                        no_error=1;
                         printf("Error type 5 at Line %d: Type mismatched for assignment.\n",p->line);
                     }
                 }
@@ -441,10 +470,12 @@ struct ast *parser_Exp(struct ast *p)
         }
         else if(strcmp(left->name,"INT")==0)
         {
+            no_error=1;
             printf("Error type 6 at Line %d: The left-hand side of an assignment must be a varia- ble.\n",p->line);
         }
         else if(strcmp(left->name,"FLOAT")==0)
         {
+            no_error=1;
             printf("Error type 6 at Line %d: The left-hand side of an assignment must be a varia- ble.\n",p->line);
         }
 
@@ -456,10 +487,12 @@ struct ast *parser_Exp(struct ast *p)
         struct symbol_node *symbol=in_symbol_table(p,-1);
         if(symbol==NULL)
         {
+            no_error=1;
             printf("Error type 2 at Line %d: Undefined function \"%s\".\n",p->line,p->content);
         }
         else if(symbol->tag!=3)
         {
+            no_error=1;
             printf("Error type 11 at Line %d: \"%s\" is not a function.\n",p->line,p->content);
         }
         else
@@ -488,6 +521,7 @@ struct ast *parser_Exp(struct ast *p)
             }
             if(symbol->pnum!=num)
             {
+                no_error=1;
                 printf("Error type 9 at Line %d: Function \"%s\" is not applicable for arguments\n",right->line,symbol->name);
             }
         }
@@ -501,6 +535,7 @@ struct ast *parser_Exp(struct ast *p)
             struct symbol_node *symbol=in_symbol_table(left,0);
             if(symbol==NULL)
             {
+                no_error=1;
                 printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,left->content);
             }
             else
@@ -510,12 +545,14 @@ struct ast *parser_Exp(struct ast *p)
                     struct symbol_node *right_symbol=in_symbol_table(left,0);
                     if(right_symbol==NULL)
                     {
+                        no_error=1;
                         printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,right_exp->content);
                     }
                     else
                     {
                         if(strcmp(symbol->type,right_symbol->type)!=0)
                         {
+                            no_error=1;
                             printf("Error type 7 at Line %d: Type mismatched for operands.\n",p->line);
                         }
                     }
@@ -524,6 +561,7 @@ struct ast *parser_Exp(struct ast *p)
                 {
                     if(strcmp(symbol->type,"int")!=0)
                     {
+                        no_error=1;
                         printf("Error type 7 at Line %d: Type mismatched for operands.\n",p->line);
                     }
                 }
@@ -531,6 +569,7 @@ struct ast *parser_Exp(struct ast *p)
                 {
                     if(strcmp(symbol->type,"float")!=0)
                     {
+                        no_error=1;
                         printf("Error type 7 at Line %d: Type mismatched for operands.\n",p->line);
                     }
                 }
@@ -543,12 +582,14 @@ struct ast *parser_Exp(struct ast *p)
                 struct symbol_node *right_symbol=in_symbol_table(right_exp,0);
                 if(right_symbol==NULL)
                 {
+                    no_error=1;
                     printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,right_exp->content);
                 }
                 else
                 {
                     if(strcmp("int",right_symbol->type)!=0)
                     {
+                        no_error=1;
                         printf("Error type 7 at Line %d: Type mismatched for operands.\n",p->line);
                     }
 
@@ -556,6 +597,7 @@ struct ast *parser_Exp(struct ast *p)
             }
             else if(strcmp(right_exp->name,"FLOAT")==0)
             {
+                no_error=1;
                 printf("Error type 7 at Line %d: Type mismatched for operands.\n",p->line);
             }
         }
@@ -566,18 +608,21 @@ struct ast *parser_Exp(struct ast *p)
                 struct symbol_node *right_symbol=in_symbol_table(right_exp,0);
                 if(right_symbol==NULL)
                 {
+                    no_error=1;
                     printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,right_exp->content);
                 }
                 else
                 {
                     if(strcmp("float",right_symbol->type)!=0)
                     {
+                        no_error=1;
                         printf("Error type 7 at Line %d: Type mismatched for operands.\n",p->line);
                     }
                 }
             }
             else if(strcmp(right_exp->name,"INT")==0)
             {
+                no_error=1;
                 printf("Error type 7 at Line %d: Type mismatched for operands.\n",p->line);
             }
         }
@@ -588,10 +633,13 @@ struct ast *parser_Exp(struct ast *p)
         struct symbol_node *symbol=in_symbol_table(p->left,-1);
         if(symbol==NULL)
         {
+            no_error=1;
             printf("Error type 1 at Line %d: Undefined Array \"%s\".\n",p->line,p->left->content);
+
         }
         else if(symbol->tag!=2)
         {
+            no_error=1;
             printf("Error type 10 at Line %d: \"%s\" is not an array.\n", p->line,p->left->content);
         }
         else
@@ -599,6 +647,7 @@ struct ast *parser_Exp(struct ast *p)
             right=right->right;
             if(strcmp(right->left->name,"FLOAT")==0)
             {
+                no_error=1;
                 printf("Error type 12 at Line %d: \"%f\" is not an integer.\n",p->line,right->left->value);
             }
             else if(strcmp(right->left->name,"ID")==0)
@@ -606,10 +655,13 @@ struct ast *parser_Exp(struct ast *p)
                 struct symbol_node *symbol_id=in_symbol_table(right->left,-1);
                 if(symbol_id==NULL)
                 {
+                    no_error=1;
                     printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,right->left->content);
+
                 }
                 else if(strcmp(symbol_id->type,"int"))
                 {
+                    no_error=1;
                     printf("Error type 12 at Line %d: \"%s\" is not an integer.\n",p->line,right->left->content);
                 }
             }
@@ -623,14 +675,18 @@ struct ast *parser_Exp(struct ast *p)
             struct symbol_node *symbol=in_symbol_table(p->left,-1);
             if(symbol==NULL)
             {
+                no_error=1;
                 printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,p->left->content);
             }
             else if(symbol->tag!=1)
             {
                 printf("Error type 13 at Line %d: Illegal use of \".\".\n",p->line);
+                no_error=1;
+
             }
             else if(strcmp(symbol->type,"int")==0||strcmp(symbol->type,"float")==0)
             {
+                no_error=1;
                 printf("Error type 13 at Line %d: Illegal use of \".\".\n",p->line);
             }
             else
@@ -650,6 +706,7 @@ struct ast *parser_Exp(struct ast *p)
                     if(struct_symbol_p==NULL)
                     {
                         printf("Error type 14 at Line %d: Non-existent field \"%s\".\n",p->line,right->right->content);
+                        no_error=1;
                     }
                 }
             }
@@ -657,6 +714,7 @@ struct ast *parser_Exp(struct ast *p)
         else
         {
             printf("Error type 13 at Line %d: Illegal use of \".\".\n",p->line);
+            no_error=1;
         }
     }
     p=NULL;
@@ -723,7 +781,7 @@ void parser(struct ast *p)
 
     if(p!=NULL)
     {
-        if(!strcmp(p->name,"Stmt"))
+        if(!strcmp(p->name,"Stmt")&&no_error==0)
         {
             inter_code_tail->next=translate_Stmt(p->left);
             while(inter_code_tail->next!=NULL)

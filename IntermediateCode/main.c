@@ -1,7 +1,9 @@
 #include "gramtree.h"
 #include "symboltable.h"
-extern struct ast *root;
 
+extern struct ast *root;
+int yyrestart(FILE *);
+int yyparse();
 int main(int argc, char const *argv[])
 {
     if(argc>1)
@@ -15,7 +17,7 @@ int main(int argc, char const *argv[])
         //yydebug=1;
         yyrestart(f);
         yyparse();
-        eval(root,0);
+        //eval(root,0);
         init_inter_code();
         build_symbol_table();
         print_inter_code();
