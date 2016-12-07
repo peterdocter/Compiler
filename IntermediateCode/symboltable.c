@@ -32,7 +32,7 @@ void build_symbol_table()
 
     symboltable[3]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     struct_tail=symboltable[3];
-    parser(root);
+    //parser(root);
 }
 
 struct ast * parser_Specifier(struct ast *p)

@@ -509,12 +509,16 @@ char * new_temp()
 
 void print_inter_code()
 {
+    FILE *f;
+    f=fopen("output/output.txt","w");
     struct InterCode *p=inter_code_head->next;
     while(p!=NULL)
     {
         printf("%s\n",p->string);
+        fprintf(f,"%s\n",p->string);
         p=p->next;
     }
+    fclose(f);
 }
 
 struct InterCode* add_inter_code(struct InterCode *code1,int num,...)
