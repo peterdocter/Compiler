@@ -39,6 +39,25 @@ struct InterCode * translate_Exp(struct ast * ast_p,char *place)
         {
             if(!strcmp(ast_p->left->name,"ID"))
             {
+                if(!strcmp(ast_p->right->right->left->name,"INT"))
+                {
+                    struct InterCode *code1=(struct InterCode*)malloc(sizeof(struct InterCode));
+                    code1->next=NULL;
+                    code1->pre=NULL;
+                    sprintf(code1->string,"%s := #%d",ast_p->left->content,ast_p->right->right->left->int_value);
+
+                    if(place!=NULL)
+                    {
+                        struct InterCode *code3=(struct InterCode*)malloc(sizeof(struct InterCode));
+                        code3->next=NULL;
+                        code3->pre=NULL;
+                        sprintf(code3->string,"%s := %s",place,ast_p->left->content);
+
+                        return add_inter_code(code1,1,code3);
+                    }
+                    else
+                          return code1;
+                }
                 struct symbol_node *variable=lookup(ast_p->left);
                 char   *t1=new_temp();
                 struct InterCode *code1=translate_Exp(ast_p->right->right->left,t1);
@@ -87,6 +106,31 @@ struct InterCode * translate_Exp(struct ast * ast_p,char *place)
         }
         else if(!strcmp(ast_p->right->name,"MINUS"))
         {
+            if(!strcmp(ast_p->left->name,"ID"))
+            {
+                if(!strcmp(ast_p->right->right->left->name,"INT"))
+                {
+                    if(place!=NULL)
+                    {
+                        struct InterCode *code3=(struct InterCode*)malloc(sizeof(struct InterCode));
+                        code3->next=NULL;
+                        code3->pre=NULL;
+                        sprintf(code3->string,"%s := %s - #%d",place,ast_p->left->content,ast_p->right->right->left->int_value);
+                        return code3;
+                    }
+                }
+                else if(!strcmp(ast_p->right->right->left->name,"ID"))
+                {
+                    if(place!=NULL)
+                    {
+                        struct InterCode *code3=(struct InterCode*)malloc(sizeof(struct InterCode));
+                        code3->next=NULL;
+                        code3->pre=NULL;
+                        sprintf(code3->string,"%s := %s - %s",place,ast_p->left->content,ast_p->right->right->left->content);
+                        return code3;
+                    }
+                }
+            }
             char *t1=new_temp();
             char *t2=new_temp();
             struct InterCode *code1=translate_Exp(ast_p->left,t1);
@@ -222,6 +266,10 @@ struct InterCode * translate_Exp(struct ast * ast_p,char *place)
             inter_code=add_inter_code(code1,1,code2);
         }
     }
+    else if(!strcmp(ast_p->name,"Exp")&&ast_p->right!=NULL&&!strcmp(ast_p->right->name,"LB"))
+    {
+        //数组
+    }
     return inter_code;
 }
 
@@ -238,6 +286,23 @@ struct InterCode *translate_Stmt(struct ast *ast_p)
     }
     else if(!strcmp(ast_p->name,"RETURN"))
     {
+        if(!strcmp(ast_p->right->left->name,"ID"))
+        {
+            struct InterCode *code2=(struct InterCode*)malloc(sizeof(struct InterCode));
+            code2->next=NULL;
+            code2->pre=NULL;
+            sprintf(code2->string,"RETURN %s",ast_p->right->left->content);
+            return code2;
+        }
+
+        if(!strcmp(ast_p->right->left->name,"INT"))
+        {
+            struct InterCode *code2=(struct InterCode*)malloc(sizeof(struct InterCode));
+            code2->next=NULL;
+            code2->pre=NULL;
+            sprintf(code2->string,"RETURN #%d",ast_p->right->left->int_value);
+            return code2;
+        }
         char *t1=new_temp();
         struct InterCode *code1=translate_Exp(ast_p->right->left,t1);
         struct InterCode *code2=(struct InterCode*)malloc(sizeof(struct InterCode));
@@ -347,6 +412,54 @@ struct InterCode *translate_Cond(struct ast *ast_p,char *label_true,char *label_
     }
     else if(ast_p->right!=NULL&&!strcmp(ast_p->right->name,"RELOP"))
     {
+        if(!strcmp(ast_p->left->name,"ID"))
+        {
+            if(!strcmp(ast_p->right->right->left->name,"INT"))
+            {
+                struct InterCode *code3=(struct InterCode*)malloc(sizeof(struct InterCode));
+                code3->next=NULL;
+                code3->pre=NULL;
+                sprintf(code3->string,"IF %s %s #%d GOTO %s",ast_p->left->content,ast_p->right->content,ast_p->right->right->left->int_value,label_true);
+
+                struct InterCode *code4=(struct InterCode*)malloc(sizeof(struct InterCode));
+                code4->next=NULL;
+                code4->pre=NULL;
+                sprintf(code4->string,"GOTO %s",label_false);
+
+                return add_inter_code(code3,1,code4);
+            }
+            else if(!strcmp(ast_p->right->right->left->name,"ID"))
+            {
+                struct InterCode *code3=(struct InterCode*)malloc(sizeof(struct InterCode));
+                code3->next=NULL;
+                code3->pre=NULL;
+                sprintf(code3->string,"IF %s %s %s GOTO %s",ast_p->left->content,ast_p->right->content,ast_p->right->right->left->content,label_true);
+
+                struct InterCode *code4=(struct InterCode*)malloc(sizeof(struct InterCode));
+                code4->next=NULL;
+                code4->pre=NULL;
+                sprintf(code4->string,"GOTO %s",label_false);
+
+                return add_inter_code(code3,1,code4);
+            }
+            else
+            {
+                char *t1=new_temp();
+                struct InterCode *code1=translate_Exp(ast_p->right->right->left,t1);
+
+                struct InterCode *code2=(struct InterCode*)malloc(sizeof(struct InterCode));
+                code2->next=NULL;
+                code2->pre=NULL;
+                sprintf(code2->string,"IF %s %s %s GOTO %s",ast_p->left->content,ast_p->right->content,t1,label_true);
+
+                struct InterCode *code3=(struct InterCode*)malloc(sizeof(struct InterCode));
+                code3->next=NULL;
+                code3->pre=NULL;
+                sprintf(code3->string,"GOTO %s",label_false);
+
+                return add_inter_code(code1,2,code2,code3);
+            }
+        }
         char *t1=new_temp();
         char *t2=new_temp();
 

@@ -4,7 +4,6 @@ int fact(int n)
         return n;
     else
         return (n*fact(n-1));
-    return 0;
 }
 int main()
 {
