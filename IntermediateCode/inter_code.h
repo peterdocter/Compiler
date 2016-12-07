@@ -21,6 +21,8 @@ struct InterCode *translate_Stmt(struct ast *ast_p);
 struct InterCode *translate_Cond(struct ast *ast_p,char *label_true,char *label_false);
 struct InterCode *translate_Args(struct ast *ast_p,struct InterCode *arg_list);
 struct InterCode *translate_CompSt(struct ast *ast_p);
+struct InterCode *translate_Func(struct ast *ast_p);
+struct InterCode *translate_VarDec(struct ast *ast_p);
 char * new_label();
 char * new_temp();
 void  print_inter_code();

@@ -13,7 +13,11 @@ void init_inter_code()
 struct InterCode * translate_Exp(struct ast * ast_p,char *place)
 {
     struct InterCode *inter_code;
-    if(strcmp(ast_p->name,"INT")==0)
+    if(!strcmp(ast_p->name,"LP"))
+    {
+        inter_code=translate_Exp(ast_p->right->left,place);
+    }
+    else if(strcmp(ast_p->name,"INT")==0)
     {
         inter_code=(struct InterCode*)malloc(sizeof(struct InterCode));
         inter_code->next=NULL;
@@ -178,7 +182,44 @@ struct InterCode * translate_Exp(struct ast * ast_p,char *place)
         }
         else
         {
+            struct symbol_node *function=lookup(ast_p);
 
+            struct InterCode *arg_list=(struct InterCode*)malloc(sizeof(struct InterCode));
+            arg_list->next=NULL;
+            arg_list->pre=NULL;
+
+            struct InterCode *code1=translate_Args(ast_p->right->right->left,arg_list);
+
+            if(!strcmp(function->name,"write"))
+            {
+                struct InterCode *write_arg=(struct InterCode*)malloc(sizeof(struct InterCode));
+                write_arg->next=NULL;
+                write_arg->pre=NULL;
+                sprintf(write_arg->string,"WRITE %s",arg_list->string);
+                inter_code=add_inter_code(code1,1,write_arg);
+                return inter_code;
+            }
+            struct InterCode *p=arg_list;
+            while (p->next!=NULL)
+            {
+                p=p->next;
+            }
+
+            p=p->pre;
+            while(p!=NULL)
+            {
+                struct InterCode *code2=(struct InterCode*)malloc(sizeof(struct InterCode));
+                code2->next=NULL;
+                code2->pre=NULL;
+                sprintf(code2->string,"ARG %s",p->string);
+                code1=add_inter_code(code1,1,code2);
+                p=p->pre;
+            }
+            struct InterCode *code2=(struct InterCode*)malloc(sizeof(struct InterCode));
+            code2->next=NULL;
+            code2->pre=NULL;
+            sprintf(code2->string,"%s := CALL %s",place,function->name);
+            inter_code=add_inter_code(code1,1,code2);
         }
     }
     return inter_code;
@@ -193,7 +234,7 @@ struct InterCode *translate_Stmt(struct ast *ast_p)
     }
     else if(!strcmp(ast_p->name,"CompSt"))
     {
-        inter_code=translate_CompSt(ast_p);
+        inter_code=translate_CompSt(ast_p->left);
     }
     else if(!strcmp(ast_p->name,"RETURN"))
     {
@@ -231,7 +272,6 @@ struct InterCode *translate_Stmt(struct ast *ast_p)
         }
         else
         {
-
             struct ast *stmt_p_2=stmt_p->right->right;
             char *label1=new_label();
             char *label2=new_label();
@@ -376,14 +416,81 @@ struct InterCode *translate_Cond(struct ast *ast_p,char *label_true,char *label_
 
 struct InterCode *translate_Args(struct ast *ast_p,struct InterCode *arg_list)
 {
-    return NULL;
+    if(!strcmp(ast_p->name,"Exp")&&ast_p->right==NULL)
+    {
+        char *t1=new_temp();
+        struct InterCode* code1=translate_Exp(ast_p->left,t1);
+        struct InterCode* p=arg_list;
+        while(p->next!=NULL)
+        {
+            p=p->next;
+        }
+        strcpy(p->string,t1);
+
+        p->next=(struct InterCode*)malloc(sizeof(struct InterCode));
+        p->next->pre=p;
+        p=p->next;
+        p->next=NULL;
+        return code1;
+    }
+    else
+    {
+        char *t1=new_temp();
+        struct InterCode *code1=translate_Exp(ast_p->left,t1);
+        struct InterCode *p=arg_list;
+        while(p->next!=NULL)
+        {
+            p=p->next;
+        }
+        strcpy(p->string,t1);
+        p->next=(struct InterCode*)malloc(sizeof(struct InterCode));
+        p->next->pre=p;
+        p=p->next;
+        p->next=NULL;
+
+        struct InterCode *code2=translate_Args(ast_p->right->right->left,p);
+
+        return add_inter_code(code1,1,code2);
+    }
 }
 
 struct InterCode *translate_CompSt(struct ast *ast_p)
 {
-    return NULL;
+    struct InterCode* inter_code=NULL;
+    struct ast *p=ast_p;
+    while(p!=NULL)
+    {
+        if(!strcmp(p->name,"StmtList")&&p->line!=-1)
+        {
+            struct InterCode *code=translate_Stmt(p->left->left);
+            if(inter_code==NULL)
+                inter_code=code;
+            else
+                inter_code=add_inter_code(inter_code,1,code);
+            p=p->left;
+        }
+        p=p->right;
+    }
+    return inter_code;
 }
 
+struct InterCode* translate_Func(struct ast *ast_p)
+{
+    struct InterCode *inter_code=(struct InterCode*)malloc(sizeof(struct InterCode));
+    inter_code->next=NULL;
+    inter_code->pre=NULL;
+    sprintf(inter_code->string,"\nFUNCTION %s :",ast_p->content);
+    return inter_code;
+}
+
+struct InterCode* translate_VarDec(struct ast *ast_p)
+{
+    struct InterCode *inter_code=(struct InterCode*)malloc(sizeof(struct InterCode));
+    inter_code->next=NULL;
+    inter_code->pre=NULL;
+    sprintf(inter_code->string,"PARAM %s",ast_p->content);
+    return inter_code;
+}
 
 char * new_label()
 {

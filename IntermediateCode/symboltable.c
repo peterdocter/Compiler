@@ -10,6 +10,26 @@ void build_symbol_table()
     array_tail->pre=NULL;
     symboltable[2]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     func_tail=symboltable[2];
+
+    func_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+    func_tail->next->pre=func_tail;
+    func_tail=func_tail->next;
+    func_tail->next=NULL;
+    func_tail->tag=3;
+    func_tail->pnum=1;
+    strcpy(func_tail->rtype,"int");
+    strcpy(func_tail->name,"write");
+
+    func_tail->next=(struct symbol_node*)malloc(sizeof(struct symbol_node));
+    func_tail->next->pre=func_tail;
+    func_tail=func_tail->next;
+    func_tail->next=NULL;
+    func_tail->tag=3;
+    func_tail->pnum=0;
+    strcpy(func_tail->rtype,"int");
+    strcpy(func_tail->name,"read");
+
+
     symboltable[3]=(struct symbol_node*)malloc(sizeof(struct symbol_node));
     struct_tail=symboltable[3];
     parser(root);
@@ -40,6 +60,15 @@ struct ast * parser_Specifier(struct ast *p)
                 func_tail->pnum=0;
                 strcpy(func_tail->rtype,p->type);
                 strcpy(func_tail->name,right->content);
+
+
+                inter_code_tail->next=translate_Func(right);
+                inter_code_tail->next->pre=inter_code_tail;
+                while(inter_code_tail->next!=NULL)
+                {
+                    inter_code_tail=inter_code_tail->next;
+                }
+
             }
             p=right;
         }
@@ -198,6 +227,12 @@ struct ast * parser_Specifier(struct ast *p)
         strcpy(var_tail->type,p->type);
         strcpy(var_tail->name,right->content);
 
+        inter_code_tail->next=translate_VarDec(right);
+        inter_code_tail->next->pre=inter_code_tail;
+        while(inter_code_tail->next!=NULL)
+        {
+            inter_code_tail=inter_code_tail->next;
+        }
     }
     else if(strcmp(right->name,"DecList")==0)
     {
@@ -340,7 +375,7 @@ struct ast *parser_Exp(struct ast *p)
     {
         return NULL;
     }
-    else if(!strcmp(p->name,"ID"))
+    else if(!strcmp(p->name,"ID")&&p->right==NULL)
     {
         struct symbol_node *symbol=in_symbol_table(p,0);
         if(symbol==NULL)
@@ -349,6 +384,11 @@ struct ast *parser_Exp(struct ast *p)
         }
         return NULL;
     }
+    else if(!strcmp(p->name,"INT")||!strcmp(p->name,"FLOAT"))
+    {
+        return NULL;
+    }
+
     struct ast *left=p->left;
     struct ast *right=p->right;
     //赋值
@@ -627,7 +667,6 @@ void parser(struct ast *p)
 {
     if(p==NULL||p->line==-1)
         return;
-    printf("%s\n",p->name);
     if(strcmp(p->name,"Specifier")==0)
     {
         p=parser_Specifier(p);
@@ -746,7 +785,6 @@ struct symbol_node* in_symbol_table(struct ast *p,int index)
             }
             symbol_p=symbol_p->next;
         }
-
     }
     return NULL;
 }

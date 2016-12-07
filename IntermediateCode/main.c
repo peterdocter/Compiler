@@ -18,7 +18,6 @@ int main(int argc, char const *argv[])
         eval(root,0);
         init_inter_code();
         build_symbol_table();
-        printf("print_inter_code\n");
         print_inter_code();
         return 0;
     }
