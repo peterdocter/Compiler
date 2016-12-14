@@ -1,34 +1,42 @@
 
-FUNCTION fact :
-PARAM n
-IF n == #1 GOTO label0
+FUNCTION main :
+READ temp0
+n := temp0
+IF n > #0 GOTO label0
 GOTO label1
 LABEL label0 :
-RETURN n
+temp1 := #1
+WRITE temp1
 GOTO label2
 LABEL label1 :
-temp1 := n
-temp3 := n - #1
-ARG temp3
-temp2 := CALL fact
-temp0 := temp1 * temp2
-RETURN temp0
-LABEL label2 :
-
-FUNCTION main :
-READ temp4
-m := temp4
-IF m > #1 GOTO label3
+IF n < #0 GOTO label3
 GOTO label4
 LABEL label3 :
-temp6 := m
-ARG temp6
-temp5 := CALL fact
-result := temp5
+temp3 := #1
+temp2 := #0 - temp3
+WRITE temp2
 GOTO label5
 LABEL label4 :
-result := #1
+temp4 := #0
+WRITE temp4
 LABEL label5 :
-temp7 := result
-WRITE temp7
-RETURN #0
+LABEL label2 :
+temp5 := #1
+WRITE temp5
+IF n < #0 GOTO label6
+GOTO label7
+LABEL label6 :
+temp7 := #1
+temp6 := #0 - temp7
+WRITE temp6
+GOTO label8
+LABEL label7 :
+temp8 := #0
+WRITE temp8
+LABEL label8 :
+temp10 := #1
+temp9 := #0 - temp10
+WRITE temp9
+temp11 := #0
+WRITE temp11
+RETURN #1
