@@ -335,7 +335,30 @@ struct ast * parser_RETURN(struct ast *p)
 
 struct ast *parser_Exp(struct ast *p)
 {
+    struct ast *root=p;
     p=p->left;
+    if(!strcmp(p->name,"NOT"))
+    {
+        return NULL;
+    }
+    else if(!strcmp(p->name,"MINUS"))
+    {
+        return NULL;
+    }
+    else if(!strcmp(p->name,"ID")&&p->right==NULL)
+    {
+        struct symbol_node *symbol=in_symbol_table(p,0);
+        if(symbol==NULL)
+        {
+            printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,p->content);
+        }
+        return NULL;
+    }
+    else if(!strcmp(p->name,"INT")||!strcmp(p->name,"FLOAT"))
+    {
+        return NULL;
+    }
+
     struct ast *left=p->left;
     struct ast *right=p->right;
     //赋值
@@ -343,7 +366,7 @@ struct ast *parser_Exp(struct ast *p)
     {
         if(strcmp(left->name,"ID")==0)
         {
-            struct symbol_node *symbol=in_symbol_table(left,0);
+            struct symbol_node *symbol=in_symbol_table(left,-1);
             if(symbol==NULL)
             {
                 printf("Error type 1 at Line %d: Undefined variable \"%s\".\n",p->line,left->content);
@@ -605,8 +628,7 @@ struct ast *parser_Exp(struct ast *p)
             printf("Error type 13 at Line %d: Illegal use of \".\".\n",p->line);
         }
     }
-    p=NULL;
-    return p;
+    return root->right;
 }
 void parser(struct ast *p)
 {
