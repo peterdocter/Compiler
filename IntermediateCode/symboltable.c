@@ -389,6 +389,7 @@ struct ast * parser_RETURN(struct ast *p)
 
 struct ast *parser_Exp(struct ast *p)
 {
+    struct ast *root=p;
     p=p->left;
     if(!strcmp(p->name,"NOT"))
     {
@@ -420,7 +421,7 @@ struct ast *parser_Exp(struct ast *p)
     {
         if(strcmp(left->name,"ID")==0)
         {
-            struct symbol_node *symbol=in_symbol_table(left,0);
+            struct symbol_node *symbol=in_symbol_table(left,-1);
             if(symbol==NULL)
             {
                 no_error=1;
@@ -717,8 +718,7 @@ struct ast *parser_Exp(struct ast *p)
             no_error=1;
         }
     }
-    p=NULL;
-    return p;
+    return root->right;
 }
 
 void parser(struct ast *p)
@@ -778,7 +778,6 @@ void parser(struct ast *p)
     {
         p=parser_Exp(p);
     }
-
     if(p!=NULL)
     {
         if(!strcmp(p->name,"Stmt")&&no_error==0)
