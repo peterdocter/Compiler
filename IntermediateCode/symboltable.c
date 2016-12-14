@@ -718,6 +718,7 @@ struct ast *parser_Exp(struct ast *p)
             no_error=1;
         }
     }
+    return NULL;//不对深层次语句做语法分析；
     return root->right;
 }
 

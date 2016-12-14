@@ -21,22 +21,4 @@ temp4 := #0
 WRITE temp4
 LABEL label5 :
 LABEL label2 :
-temp5 := #1
-WRITE temp5
-IF n < #0 GOTO label6
-GOTO label7
-LABEL label6 :
-temp7 := #1
-temp6 := #0 - temp7
-WRITE temp6
-GOTO label8
-LABEL label7 :
-temp8 := #0
-WRITE temp8
-LABEL label8 :
-temp10 := #1
-temp9 := #0 - temp10
-WRITE temp9
-temp11 := #0
-WRITE temp11
 RETURN #1
