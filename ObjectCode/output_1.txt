@@ -1,0 +1,32 @@
+
+FUNCTION main :
+a := #0
+b := #1
+i := #0
+temp0 := CALL read
+n := temp0
+LABEL label0 :
+temp1 := i
+temp2 := n
+IF temp1 < temp2 GOTO label1
+GOTO label2
+LABEL label1 :
+temp4 := a
+temp5 := b
+temp3 := temp4 + temp5
+c := temp3
+temp6 := b
+ARG temp6
+CALL write
+temp7 := b
+a := temp7
+temp8 := c
+b := temp8
+temp10 := i
+temp11 := #1
+temp9 := temp10 + temp11
+i := temp9
+GOTO label0
+LABEL label2 :
+temp12 := #0
+RETURN temp12
