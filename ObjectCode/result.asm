@@ -49,7 +49,7 @@ main:
 	sw $ra,0($sp)
 	jal read
 	lw $ra,0($sp)
-	move $t7 $v0
+	move $t7,$v0
 	addi $sp,$sp,4
 	move $t8,$t7
 	move $t9,$t8

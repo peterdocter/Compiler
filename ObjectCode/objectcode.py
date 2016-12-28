@@ -69,7 +69,7 @@ def translate(line):
                 return '\tdiv %s,%s\n\tmflo %s'%(get_reg(line[2]),get_reg(line[-1]),get_reg(line[0]))
         if line[2]=='CALL':
             if line[3]=='read' or line[3]=='write':
-                return '\taddi $sp,$sp,-4\n\tsw $ra,0($sp)\n\tjal %s\n\tlw $ra,0($sp)\n\tmove %s $v0\n\taddi $sp,$sp,4'%(line[-1],get_reg(line[0]))
+                return '\taddi $sp,$sp,-4\n\tsw $ra,0($sp)\n\tjal %s\n\tlw $ra,0($sp)\n\tmove %s,$v0\n\taddi $sp,$sp,4'%(line[-1],get_reg(line[0]))
             else:
                 return '\taddi $sp,$sp,-8\n\tsw $t0,0($sp)\n\tsw $ra,4($sp)\n\tjal %s\n\tlw $a0,0($sp)\n\tlw $ra,4($sp)\n\taddi $sp,$sp,8\n\tmove %s $v0'%(line[-1],get_reg(line[0]))
     if line[0]=='GOTO':
