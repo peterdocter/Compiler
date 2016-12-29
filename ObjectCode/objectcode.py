@@ -35,8 +35,8 @@ def get_reg(string):
             keys.append(key)
         for key in keys:
             if 'temp' in  key and key not in variables:
+                reg_ok[table[key]]=1
                 del table[key]
-                reg_ok[key]=1
         for reg in regs:
             if reg_ok[reg]==1:
                 table[string]=reg
@@ -135,7 +135,7 @@ write:
 def parser():
     for reg in regs:
         reg_ok[reg]=1
-    inter_code=load_inter_code('output.txt')
+    inter_code=load_inter_code('output_1.txt')
     load_variables(inter_code)
     obj_code=[]
     for line in inter_code:
